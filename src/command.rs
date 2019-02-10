@@ -21,7 +21,7 @@ impl Default for Command {
             buffered: false,
             double_gain: false,
             shutdown: false,
-            value: 0
+            value: 0,
         }
     }
 }
@@ -99,7 +99,14 @@ impl Command {
 mod tests {
     use super::*;
 
-    fn check_cmd(cmd: Command, channel: Channel, buffered: bool, double_gain: bool, shutdown: bool, value:  u16) {
+    fn check_cmd(
+        cmd: Command,
+        channel: Channel,
+        buffered: bool,
+        double_gain: bool,
+        shutdown: bool,
+        value: u16,
+    ) {
         assert_eq!(cmd.channel, channel);
         assert_eq!(cmd.buffered, buffered);
         assert_eq!(cmd.double_gain, double_gain);

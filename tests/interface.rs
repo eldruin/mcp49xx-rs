@@ -32,7 +32,10 @@ macro_rules! test {
         $cmd:expr, $value:expr ) => {
         #[test]
         fn $name() {
-            let trans = [SpiTrans::write(vec![($value >> 8) as u8, ($value & 0xff) as u8])];
+            let trans = [SpiTrans::write(vec![
+                ($value >> 8) as u8,
+                ($value & 0xff) as u8,
+            ])];
             let mut dev = $create(&trans);
             dev.send($cmd).unwrap();
             $destroy(dev);
@@ -80,7 +83,7 @@ mod mcp4921 {
     #[test]
     fn cannot_send_invalid_value() {
         let mut dev = new_mcp4921(&[]);
-        assert_invalid_value(&dev.send(Command::default().value(1<<12)));
+        assert_invalid_value(&dev.send(Command::default().value(1 << 12)));
         dev.destroy_mcp4921().0.done();
     }
 }

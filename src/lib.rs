@@ -51,7 +51,6 @@ pub enum Error<E> {
     Comm(E),
     // Wrong channel for this device provided
     // TODO WrongChannel,
-
     /// The value provided does not fit the bitness of the device
     InvalidValue,
 }
@@ -93,7 +92,7 @@ where
         let value_hi = (command.value >> 8) as u8;
         let data = [
             command.get_config_bits() | value_hi,
-            (command.value & 0xff) as u8
+            (command.value & 0xff) as u8,
         ];
         self.iface.write_command(data[0], data[1])
     }
@@ -116,9 +115,9 @@ impl<SPI, CS> Mcp49x<interface::SpiInterface<SPI, CS>> {
     }
 }
 
+mod command;
 #[doc(hidden)]
 pub mod interface;
-mod command;
 pub use command::Command;
 
 mod private {
@@ -127,4 +126,3 @@ mod private {
 
     impl<SPI, CS> Sealed for interface::SpiInterface<SPI, CS> {}
 }
-
