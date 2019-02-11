@@ -88,21 +88,6 @@ pub mod marker {
     pub struct Resolution12Bit(());
 }
 
-#[doc(hidden)]
-pub trait CheckValue<E>: private::Sealed {
-    fn is_value_appropriate(value: u16) -> Result<(), Error<E>>;
-}
-
-impl<E> CheckValue<E> for marker::Resolution12Bit {
-    fn is_value_appropriate(value: u16) -> Result<(), Error<E>> {
-        if value >= 1 << 12 {
-            Err(Error::InvalidValue)
-        } else {
-            Ok(())
-        }
-    }
-}
-
 impl<DI, RES, E> Mcp49x<DI, RES>
 where
     DI: interface::WriteCommand<Error = E>,
@@ -124,7 +109,10 @@ mod command;
 mod construction;
 #[doc(hidden)]
 pub mod interface;
+mod resolution;
 pub use command::Command;
+#[doc(hidden)]
+pub use resolution::CheckValue;
 
 mod private {
     use super::{interface, marker};
