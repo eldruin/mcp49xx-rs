@@ -20,5 +20,5 @@ fn main() {
     mcp4921.send(cmd.value(100)).unwrap();
 
     // Get SPI device and CS pin back
-    let (_spi, _chip_select) = mcp4921.destroy_mcp4921();
+    let (_spi, _chip_select) = mcp4921.destroy();
 }

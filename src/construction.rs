@@ -2,14 +2,14 @@ use core::marker::PhantomData;
 use {interface, marker, Mcp49x};
 
 macro_rules! impl_create_destroy {
-    ($dev:expr, $create:ident, $destroy:ident, $resolution:ident) => {
+    ($dev:expr, $create:ident, $resolution:ident) => {
         impl_create_destroy! {
-            @gen [$create, $destroy, $resolution,
+            @gen [$create, $resolution,
                 concat!("Create a new instance of a ", $dev, " device.")]
         }
     };
 
-    ( @gen [$create:ident, $destroy:ident, $resolution:ident, $doc:expr] ) => {
+    ( @gen [$create:ident, $resolution:ident, $doc:expr] ) => {
         impl<SPI, CS> Mcp49x<interface::SpiInterface<SPI, CS>, marker::$resolution> {
             #[doc = $doc]
             pub fn $create(spi: SPI, chip_select: CS) -> Self {
@@ -23,11 +23,11 @@ macro_rules! impl_create_destroy {
             }
 
             /// Destroy driver instance, return SPI bus instance and CS output pin.
-            pub fn $destroy(self) -> (SPI, CS) {
+            pub fn destroy(self) -> (SPI, CS) {
                 (self.iface.spi, self.iface.cs)
             }
         }
     };
 }
 
-impl_create_destroy!("MCP4921", new_mcp4921, destroy_mcp4921, Resolution12Bit);
+impl_create_destroy!("MCP4921", new_mcp4921, Resolution12Bit);

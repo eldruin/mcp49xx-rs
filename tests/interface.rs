@@ -11,26 +11,20 @@ impl embedded_hal::digital::OutputPin for DummyOutputPin {
 }
 
 macro_rules! device_support {
-    ($create:ident, $destroy:ident, $resolution:ident) => {
+    ($create:ident, $resolution:ident) => {
         pub fn $create(
             transactions: &[SpiTrans],
         ) -> Mcp49x<interface::SpiInterface<SpiMock, DummyOutputPin>, marker::$resolution> {
             Mcp49x::$create(SpiMock::new(&transactions), DummyOutputPin)
         }
-
-        pub fn $destroy(
-            dev: Mcp49x<interface::SpiInterface<SpiMock, DummyOutputPin>, marker::$resolution>,
-        ) {
-            dev.$destroy().0.done();
-        }
     };
 }
 
-device_support!(new_mcp4921, destroy_mcp4921, Resolution12Bit);
+device_support!(new_mcp4921, Resolution12Bit);
 
 #[macro_export]
 macro_rules! test {
-    ($name:ident, $create:ident, $destroy:ident, $cmd:expr, $value:expr ) => {
+    ($name:ident, $create:ident, $cmd:expr, $value:expr ) => {
         #[test]
         fn $name() {
             let trans = [SpiTrans::write(vec![
@@ -39,7 +33,7 @@ macro_rules! test {
             ])];
             let mut dev = $create(&trans);
             dev.send($cmd).unwrap();
-            $destroy(dev);
+            dev.destroy().0.done();
         }
     };
 }
@@ -63,15 +57,13 @@ fn invalid_value_can_fail() {
 }
 
 macro_rules! ic_test {
-    ($ic:ident, $create:ident, $destroy:ident, $value:expr,
-     $expected_value:expr, $too_big_value:expr) => {
+    ($ic:ident, $create:ident, $value:expr, $expected_value:expr, $too_big_value:expr) => {
         mod $ic {
             use super::*;
 
             test!(
                 send_default,
                 $create,
-                $destroy,
                 Command::default(),
                 0b0011_0000_0000_0000
             );
@@ -79,7 +71,6 @@ macro_rules! ic_test {
             test!(
                 send_value,
                 $create,
-                $destroy,
                 Command::default().value($value),
                 $expected_value
             );
@@ -88,13 +79,12 @@ macro_rules! ic_test {
             fn cannot_send_invalid_value() {
                 let mut dev = $create(&[]);
                 assert_invalid_value(&dev.send(Command::default().value($too_big_value)));
-                dev.$destroy().0.done();
+                dev.destroy().0.done();
             }
 
             test!(
                 send_shutdown,
                 $create,
-                $destroy,
                 Command::default().shutdown(),
                 0b0010_0000_0000_0000
             );
@@ -102,7 +92,6 @@ macro_rules! ic_test {
             test!(
                 send_double_gain,
                 $create,
-                $destroy,
                 Command::default().double_gain(),
                 0b0001_0000_0000_0000
             );
@@ -110,7 +99,6 @@ macro_rules! ic_test {
             test!(
                 send_buffered,
                 $create,
-                $destroy,
                 Command::default().buffered(),
                 0b0111_0000_0000_0000
             );
@@ -121,7 +109,6 @@ macro_rules! ic_test {
 ic_test!(
     mcp4921,
     new_mcp4921,
-    destroy_mcp4921,
     0b0000_1010_1010_1010,
     0b0011_1010_1010_1010,
     1 << 12
