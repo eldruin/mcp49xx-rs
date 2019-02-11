@@ -41,6 +41,7 @@
 #![deny(unsafe_code, missing_docs, warnings)]
 #![no_std]
 
+use core::marker::PhantomData;
 extern crate embedded_hal as hal;
 use hal::spi::{Mode, Phase, Polarity};
 
@@ -76,19 +77,41 @@ impl Default for Channel {
 
 /// MCP49x digital potentiometer driver
 #[derive(Debug, Default)]
-pub struct Mcp49x<DI> {
+pub struct Mcp49x<DI, RES> {
     iface: DI,
+    _resolution: PhantomData<RES>,
 }
 
-impl<DI, E> Mcp49x<DI>
+/// Markers
+pub mod marker {
+    /// 12-Bit resolution device
+    pub struct Resolution12Bit(());
+}
+
+#[doc(hidden)]
+pub trait CheckValue<E>: private::Sealed {
+    fn is_value_appropriate(value: u16) -> Result<(), Error<E>>;
+}
+
+impl<E> CheckValue<E> for marker::Resolution12Bit {
+    fn is_value_appropriate(value: u16) -> Result<(), Error<E>> {
+        if value >= 1 << 12 {
+            Err(Error::InvalidValue)
+        }
+        else {
+            Ok(())
+        }
+    }
+}
+
+impl<DI, RES, E> Mcp49x<DI, RES>
 where
     DI: interface::WriteCommand<Error = E>,
+    RES: CheckValue<E>
 {
     /// Send command to device.
     pub fn send(&mut self, command: Command) -> Result<(), Error<E>> {
-        if command.value > 0x0fff {
-            return Err(Error::InvalidValue);
-        }
+        RES::is_value_appropriate(command.value)?;
         let value_hi = (command.value >> 8) as u8;
         let data = [
             command.get_config_bits() | value_hi,
@@ -98,7 +121,7 @@ where
     }
 }
 
-impl<SPI, CS> Mcp49x<interface::SpiInterface<SPI, CS>> {
+impl<SPI, CS> Mcp49x<interface::SpiInterface<SPI, CS>, marker::Resolution12Bit> {
     /// Create new MCP4921 device instance
     pub fn new_mcp4921(spi: SPI, chip_select: CS) -> Self {
         Mcp49x {
@@ -106,6 +129,7 @@ impl<SPI, CS> Mcp49x<interface::SpiInterface<SPI, CS>> {
                 spi,
                 cs: chip_select,
             },
+            _resolution: PhantomData,
         }
     }
 
@@ -121,8 +145,9 @@ pub mod interface;
 pub use command::Command;
 
 mod private {
-    use super::interface;
+    use super::{interface, marker};
     pub trait Sealed {}
 
     impl<SPI, CS> Sealed for interface::SpiInterface<SPI, CS> {}
+    impl Sealed for marker::Resolution12Bit {}
 }

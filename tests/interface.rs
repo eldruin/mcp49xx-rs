@@ -1,5 +1,5 @@
 extern crate mcp49x;
-use mcp49x::{interface, Command, Error, Mcp49x};
+use mcp49x::{interface, marker, Command, Error, Mcp49x};
 extern crate embedded_hal_mock as hal;
 use self::hal::spi::{Mock as SpiMock, Transaction as SpiTrans};
 
@@ -11,20 +11,20 @@ impl embedded_hal::digital::OutputPin for DummyOutputPin {
 }
 
 macro_rules! device_support {
-    ($create:ident, $destroy:ident) => {
+    ($create:ident, $destroy:ident, $resolution:ident) => {
         pub fn $create(
             transactions: &[SpiTrans],
-        ) -> Mcp49x<interface::SpiInterface<SpiMock, DummyOutputPin>> {
+        ) -> Mcp49x<interface::SpiInterface<SpiMock, DummyOutputPin>, marker::$resolution> {
             Mcp49x::$create(SpiMock::new(&transactions), DummyOutputPin)
         }
 
-        pub fn $destroy(dev: Mcp49x<interface::SpiInterface<SpiMock, DummyOutputPin>>) {
+        pub fn $destroy(dev: Mcp49x<interface::SpiInterface<SpiMock, DummyOutputPin>, marker::$resolution>) {
             dev.$destroy().0.done();
         }
     };
 }
 
-device_support!(new_mcp4921, destroy_mcp4921);
+device_support!(new_mcp4921, destroy_mcp4921, Resolution12Bit);
 
 #[macro_export]
 macro_rules! test {
