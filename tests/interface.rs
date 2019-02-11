@@ -87,4 +87,28 @@ mod mcp4921 {
         assert_invalid_value(&dev.send(Command::default().value(1 << 12)));
         dev.destroy_mcp4921().0.done();
     }
+
+    test!(
+        send_shutdown,
+        new_mcp4921,
+        destroy_mcp4921,
+        Command::default().shutdown(),
+        0b0010_0000_0000_0000
+    );
+
+    test!(
+        send_double_gain,
+        new_mcp4921,
+        destroy_mcp4921,
+        Command::default().double_gain(),
+        0b0001_0000_0000_0000
+    );
+
+    test!(
+        send_buffered,
+        new_mcp4921,
+        destroy_mcp4921,
+        Command::default().buffered(),
+        0b0111_0000_0000_0000
+    );
 }
