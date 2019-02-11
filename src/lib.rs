@@ -97,8 +97,7 @@ impl<E> CheckValue<E> for marker::Resolution12Bit {
     fn is_value_appropriate(value: u16) -> Result<(), Error<E>> {
         if value >= 1 << 12 {
             Err(Error::InvalidValue)
-        }
-        else {
+        } else {
             Ok(())
         }
     }
@@ -107,7 +106,7 @@ impl<E> CheckValue<E> for marker::Resolution12Bit {
 impl<DI, RES, E> Mcp49x<DI, RES>
 where
     DI: interface::WriteCommand<Error = E>,
-    RES: CheckValue<E>
+    RES: CheckValue<E>,
 {
     /// Send command to device.
     pub fn send(&mut self, command: Command) -> Result<(), Error<E>> {

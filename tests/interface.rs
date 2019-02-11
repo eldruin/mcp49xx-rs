@@ -18,7 +18,9 @@ macro_rules! device_support {
             Mcp49x::$create(SpiMock::new(&transactions), DummyOutputPin)
         }
 
-        pub fn $destroy(dev: Mcp49x<interface::SpiInterface<SpiMock, DummyOutputPin>, marker::$resolution>) {
+        pub fn $destroy(
+            dev: Mcp49x<interface::SpiInterface<SpiMock, DummyOutputPin>, marker::$resolution>,
+        ) {
             dev.$destroy().0.done();
         }
     };
