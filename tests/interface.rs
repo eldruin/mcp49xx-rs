@@ -30,8 +30,7 @@ device_support!(new_mcp4921, destroy_mcp4921, Resolution12Bit);
 
 #[macro_export]
 macro_rules! test {
-    ($name:ident, $create:ident, $destroy:ident,
-        $cmd:expr, $value:expr ) => {
+    ($name:ident, $create:ident, $destroy:ident, $cmd:expr, $value:expr ) => {
         #[test]
         fn $name() {
             let trans = [SpiTrans::write(vec![
@@ -43,6 +42,24 @@ macro_rules! test {
             $destroy(dev);
         }
     };
+}
+
+fn assert_invalid_value<T, E>(result: &Result<T, Error<E>>) {
+    match result {
+        Err(Error::InvalidValue) => (),
+        _ => panic!("Invalid value not reported."),
+    }
+}
+
+#[test]
+fn invalid_value_matches() {
+    assert_invalid_value::<(), ()>(&Err(Error::InvalidValue));
+}
+
+#[should_panic]
+#[test]
+fn invalid_value_can_fail() {
+    assert_invalid_value::<(), ()>(&Ok(()));
 }
 
 mod mcp4921 {
@@ -63,24 +80,6 @@ mod mcp4921 {
         Command::default().value(0b0000_1010_1010_1010),
         0b0011_1010_1010_1010
     );
-
-    fn assert_invalid_value<T, E>(result: &Result<T, Error<E>>) {
-        match result {
-            Err(Error::InvalidValue) => (),
-            _ => panic!("Invalid value not reported."),
-        }
-    }
-
-    #[test]
-    fn invalid_value_matches() {
-        assert_invalid_value::<(), ()>(&Err(Error::InvalidValue));
-    }
-
-    #[should_panic]
-    #[test]
-    fn invalid_value_can_fail() {
-        assert_invalid_value::<(), ()>(&Ok(()));
-    }
 
     #[test]
     fn cannot_send_invalid_value() {
