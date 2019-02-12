@@ -40,22 +40,26 @@ macro_rules! test {
     };
 }
 
-fn assert_invalid_value<T, E>(result: &Result<T, Error<E>>) {
-    match result {
-        Err(Error::InvalidValue) => (),
-        _ => panic!("Invalid value not reported."),
-    }
+macro_rules! assert_error {
+    ($result:expr, $error_variant:ident) => {
+        match $result {
+            Err(Error::$error_variant) => (),
+            _ => panic!("Error not reported."),
+        }
+    };
 }
 
 #[test]
-fn invalid_value_matches() {
-    assert_invalid_value::<(), ()>(&Err(Error::InvalidValue));
+fn matches() {
+    let result: Result<(), Error<()>> = Err(Error::InvalidValue);
+    assert_error!(result, InvalidValue);
 }
 
 #[should_panic]
 #[test]
-fn invalid_value_can_fail() {
-    assert_invalid_value::<(), ()>(&Ok(()));
+fn can_fail() {
+    let result: Result<(), Error<()>> = Ok(());
+    assert_error!(result, InvalidValue);
 }
 
 macro_rules! ic_test {
@@ -80,7 +84,10 @@ macro_rules! ic_test {
             #[test]
             fn cannot_send_invalid_value() {
                 let mut dev = $create(&[]);
-                assert_invalid_value(&dev.send(Command::default().value($too_big_value)));
+                assert_error!(
+                    dev.send(Command::default().value($too_big_value)),
+                    InvalidValue
+                );
                 dev.destroy().0.done();
             }
 
