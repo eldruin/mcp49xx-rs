@@ -14,4 +14,8 @@ impl<E> ResolutionSupport<E> for marker::Resolution12Bit {
             Ok(())
         }
     }
+    fn get_value_for_spi(value: u16) -> [u8; 2] {
+        [(value >> 8) as u8, (value & 0xff) as u8]
+    }
+}
 }

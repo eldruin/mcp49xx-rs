@@ -96,12 +96,9 @@ where
     /// Send command to device.
     pub fn send(&mut self, command: Command) -> Result<(), Error<E>> {
         RES::is_value_appropriate(command.value)?;
-        let value_hi = (command.value >> 8) as u8;
-        let data = [
-            command.get_config_bits() | value_hi,
-            (command.value & 0xff) as u8,
-        ];
-        self.iface.write_command(data[0], data[1])
+        let value = RES::get_value_for_spi(command.value);
+        self.iface
+            .write_command(command.get_config_bits() | value[0], value[1])
     }
 }
 
