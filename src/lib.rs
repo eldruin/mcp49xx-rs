@@ -108,6 +108,12 @@ where
     CH: ChannelSupport<E>,
 {
     /// Send command to device.
+    ///
+    /// This will return an error if the command is not appropriate for the current device:
+    /// - If the channel is not available it will return `Error::InvalidChannel`.
+    /// - If the value is too big it will return `Error::InvalidValue`.
+    ///
+    /// Otherwise if a communication error happened it will return `Error::Comm`.
     pub fn send(&mut self, command: Command) -> Result<(), Error<E>> {
         CH::check_channel_is_appropriate(command.channel)?;
         RES::is_value_appropriate(command.value)?;
