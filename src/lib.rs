@@ -91,7 +91,7 @@ pub mod marker {
 impl<DI, RES, E> Mcp49x<DI, RES>
 where
     DI: interface::WriteCommand<Error = E>,
-    RES: CheckValue<E>,
+    RES: ResolutionSupport<E>,
 {
     /// Send command to device.
     pub fn send(&mut self, command: Command) -> Result<(), Error<E>> {
@@ -112,7 +112,7 @@ pub mod interface;
 mod resolution;
 pub use command::Command;
 #[doc(hidden)]
-pub use resolution::CheckValue;
+pub use resolution::ResolutionSupport;
 
 mod private {
     use super::{interface, marker};
