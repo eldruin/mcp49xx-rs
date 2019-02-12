@@ -116,7 +116,7 @@ where
     /// Otherwise if a communication error happened it will return `Error::Comm`.
     pub fn send(&mut self, command: Command) -> Result<(), Error<E>> {
         CH::check_channel_is_appropriate(command.channel)?;
-        RES::is_value_appropriate(command.value)?;
+        RES::check_value_is_appropriate(command.value)?;
         let value = RES::get_value_for_spi(command.value);
         self.iface
             .write_command(command.get_config_bits() | value[0], value[1])
