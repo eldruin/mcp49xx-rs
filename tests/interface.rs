@@ -22,6 +22,7 @@ macro_rules! device_support {
 
 device_support!(new_mcp4921, Resolution12Bit);
 device_support!(new_mcp4911, Resolution10Bit);
+device_support!(new_mcp4901, Resolution8Bit);
 
 #[macro_export]
 macro_rules! test {
@@ -121,4 +122,12 @@ ic_test!(
     0b0000_0010_1010_1011,
     0b0011_1010_1010_1100,
     1 << 10
+);
+
+ic_test!(
+    mcp4901,
+    new_mcp4901,
+    0b0000_0000_1010_1011,
+    0b0011_1010_1011_0000,
+    1 << 9
 );

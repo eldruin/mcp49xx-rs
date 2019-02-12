@@ -88,6 +88,8 @@ pub mod marker {
     pub struct Resolution12Bit(());
     /// 10-Bit resolution device
     pub struct Resolution10Bit(());
+    /// 8-Bit resolution device
+    pub struct Resolution8Bit(());
 }
 
 impl<DI, RES, E> Mcp49x<DI, RES>
@@ -120,4 +122,5 @@ mod private {
     impl<SPI, CS> Sealed for interface::SpiInterface<SPI, CS> {}
     impl Sealed for marker::Resolution12Bit {}
     impl Sealed for marker::Resolution10Bit {}
+    impl Sealed for marker::Resolution8Bit {}
 }
