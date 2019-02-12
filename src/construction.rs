@@ -33,3 +33,4 @@ macro_rules! impl_create_destroy {
 }
 
 impl_create_destroy!("MCP4921", new_mcp4921, Resolution12Bit);
+impl_create_destroy!("MCP4911", new_mcp4911, Resolution10Bit);
