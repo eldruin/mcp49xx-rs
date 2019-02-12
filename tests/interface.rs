@@ -1,5 +1,5 @@
 extern crate mcp49x;
-use mcp49x::{interface, marker, Command, Error, Mcp49x};
+use mcp49x::{interface, marker, Channel, Command, Error, Mcp49x};
 extern crate embedded_hal_mock as hal;
 use self::hal::spi::{Mock as SpiMock, Transaction as SpiTrans};
 
@@ -11,18 +11,22 @@ impl embedded_hal::digital::OutputPin for DummyOutputPin {
 }
 
 macro_rules! device_support {
-    ($create:ident, $resolution:ident) => {
+    ($create:ident, $resolution:ident, $channels:ident) => {
         pub fn $create(
             transactions: &[SpiTrans],
-        ) -> Mcp49x<interface::SpiInterface<SpiMock, DummyOutputPin>, marker::$resolution> {
+        ) -> Mcp49x<
+            interface::SpiInterface<SpiMock, DummyOutputPin>,
+            marker::$resolution,
+            marker::$channels,
+        > {
             Mcp49x::$create(SpiMock::new(&transactions), DummyOutputPin)
         }
     };
 }
 
-device_support!(new_mcp4921, Resolution12Bit);
-device_support!(new_mcp4911, Resolution10Bit);
-device_support!(new_mcp4901, Resolution8Bit);
+device_support!(new_mcp4921, Resolution12Bit, SingleChannel);
+device_support!(new_mcp4911, Resolution10Bit, SingleChannel);
+device_support!(new_mcp4901, Resolution8Bit, SingleChannel);
 
 #[macro_export]
 macro_rules! test {
@@ -87,6 +91,16 @@ macro_rules! ic_test {
                 assert_error!(
                     dev.send(Command::default().value($too_big_value)),
                     InvalidValue
+                );
+                dev.destroy().0.done();
+            }
+
+            #[test]
+            fn cannot_send_invalid_channel() {
+                let mut dev = $create(&[]);
+                assert_error!(
+                    dev.send(Command::default().channel(Channel::Ch1)),
+                    InvalidChannel
                 );
                 dev.destroy().0.done();
             }

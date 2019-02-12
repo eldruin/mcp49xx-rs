@@ -1,7 +1,7 @@
 use core::marker::PhantomData;
 use {interface, marker, Mcp49x};
 
-impl<SPI, CS, RES> Mcp49x<interface::SpiInterface<SPI, CS>, RES> {
+impl<SPI, CS, RES, CH> Mcp49x<interface::SpiInterface<SPI, CS>, RES, CH> {
     /// Destroy driver instance, return SPI bus instance and CS output pin.
     pub fn destroy(self) -> (SPI, CS) {
         (self.iface.spi, self.iface.cs)
@@ -9,15 +9,17 @@ impl<SPI, CS, RES> Mcp49x<interface::SpiInterface<SPI, CS>, RES> {
 }
 
 macro_rules! impl_create_destroy {
-    ($dev:expr, $create:ident, $resolution:ident) => {
+    ($dev:expr, $create:ident, $resolution:ident, $channels:ident) => {
         impl_create_destroy! {
-            @gen [$create, $resolution,
+            @gen [$create, $resolution, $channels,
                 concat!("Create a new instance of a ", $dev, " device.")]
         }
     };
 
-    ( @gen [$create:ident, $resolution:ident, $doc:expr] ) => {
-        impl<SPI, CS> Mcp49x<interface::SpiInterface<SPI, CS>, marker::$resolution> {
+    ( @gen [$create:ident, $resolution:ident, $channels:ident, $doc:expr] ) => {
+        impl<SPI, CS>
+            Mcp49x<interface::SpiInterface<SPI, CS>, marker::$resolution, marker::$channels>
+        {
             #[doc = $doc]
             pub fn $create(spi: SPI, chip_select: CS) -> Self {
                 Mcp49x {
@@ -26,12 +28,13 @@ macro_rules! impl_create_destroy {
                         cs: chip_select,
                     },
                     _resolution: PhantomData,
+                    _channels: PhantomData,
                 }
             }
         }
     };
 }
 
-impl_create_destroy!("MCP4921", new_mcp4921, Resolution12Bit);
-impl_create_destroy!("MCP4911", new_mcp4911, Resolution10Bit);
-impl_create_destroy!("MCP4901", new_mcp4901, Resolution8Bit);
+impl_create_destroy!("MCP4921", new_mcp4921, Resolution12Bit, SingleChannel);
+impl_create_destroy!("MCP4911", new_mcp4911, Resolution10Bit, SingleChannel);
+impl_create_destroy!("MCP4901", new_mcp4901, Resolution8Bit, SingleChannel);

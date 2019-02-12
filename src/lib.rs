@@ -50,9 +50,9 @@ use hal::spi::{Mode, Phase, Polarity};
 pub enum Error<E> {
     /// Communication error
     Comm(E),
-    // Wrong channel for this device provided
-    // TODO WrongChannel,
-    /// The value provided does not fit the bitness of the device
+    /// The channel provided is not available in the current device
+    InvalidChannel,
+    /// The value provided does not fit the bitness of the current device
     InvalidValue,
 }
 
@@ -67,6 +67,11 @@ pub const MODE: Mode = Mode {
 pub enum Channel {
     /// Channel 0
     Ch0,
+    /// Channel 1 (only valid for dual devices. i.e. MCP4xx2)
+    ///
+    /// Sending a command on this channel to a single channel device will
+    /// return an `Error::InvalidChannel`.
+    Ch1,
 }
 
 impl Default for Channel {
@@ -77,9 +82,10 @@ impl Default for Channel {
 
 /// MCP49x digital potentiometer driver
 #[derive(Debug, Default)]
-pub struct Mcp49x<DI, RES> {
+pub struct Mcp49x<DI, RES, CH> {
     iface: DI,
     _resolution: PhantomData<RES>,
+    _channels: PhantomData<CH>,
 }
 
 /// Markers
@@ -90,15 +96,20 @@ pub mod marker {
     pub struct Resolution10Bit(());
     /// 8-Bit resolution device
     pub struct Resolution8Bit(());
+
+    /// Single channel device
+    pub struct SingleChannel(());
 }
 
-impl<DI, RES, E> Mcp49x<DI, RES>
+impl<DI, RES, CH, E> Mcp49x<DI, RES, CH>
 where
     DI: interface::WriteCommand<Error = E>,
     RES: ResolutionSupport<E>,
+    CH: ChannelSupport<E>,
 {
     /// Send command to device.
     pub fn send(&mut self, command: Command) -> Result<(), Error<E>> {
+        CH::check_channel_is_appropriate(command.channel)?;
         RES::is_value_appropriate(command.value)?;
         let value = RES::get_value_for_spi(command.value);
         self.iface
@@ -114,6 +125,9 @@ mod resolution;
 pub use command::Command;
 #[doc(hidden)]
 pub use resolution::ResolutionSupport;
+mod channel;
+#[doc(hidden)]
+pub use channel::ChannelSupport;
 
 mod private {
     use super::{interface, marker};
@@ -123,4 +137,6 @@ mod private {
     impl Sealed for marker::Resolution12Bit {}
     impl Sealed for marker::Resolution10Bit {}
     impl Sealed for marker::Resolution8Bit {}
+
+    impl Sealed for marker::SingleChannel {}
 }

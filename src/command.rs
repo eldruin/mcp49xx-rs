@@ -3,7 +3,7 @@ use super::Channel;
 /// Configurable command that can be sent to the device
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Command {
-    channel: Channel,
+    pub(crate) channel: Channel,
     buffered: bool,
     double_gain: bool,
     shutdown: bool,
@@ -27,6 +27,13 @@ impl Default for Command {
 }
 
 impl Command {
+    /// Select the channel
+    pub fn channel(self, channel: Channel) -> Self {
+        let mut cmd = self;
+        cmd.channel = channel;
+        cmd
+    }
+
     /// Shutdown the channel
     pub fn shutdown(self) -> Self {
         let mut cmd = self;
