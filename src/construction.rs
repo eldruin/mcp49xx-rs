@@ -1,6 +1,13 @@
 use core::marker::PhantomData;
 use {interface, marker, Mcp49x};
 
+impl<SPI, CS, RES> Mcp49x<interface::SpiInterface<SPI, CS>, RES> {
+    /// Destroy driver instance, return SPI bus instance and CS output pin.
+    pub fn destroy(self) -> (SPI, CS) {
+        (self.iface.spi, self.iface.cs)
+    }
+}
+
 macro_rules! impl_create_destroy {
     ($dev:expr, $create:ident, $resolution:ident) => {
         impl_create_destroy! {
@@ -20,11 +27,6 @@ macro_rules! impl_create_destroy {
                     },
                     _resolution: PhantomData,
                 }
-            }
-
-            /// Destroy driver instance, return SPI bus instance and CS output pin.
-            pub fn destroy(self) -> (SPI, CS) {
-                (self.iface.spi, self.iface.cs)
             }
         }
     };
