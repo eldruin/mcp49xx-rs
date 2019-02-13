@@ -33,6 +33,14 @@ device_support!(new_mcp4922, Resolution12Bit, DualChannel, Buffered);
 device_support!(new_mcp4912, Resolution10Bit, DualChannel, Buffered);
 device_support!(new_mcp4902, Resolution8Bit, DualChannel, Buffered);
 
+device_support!(new_mcp4821, Resolution12Bit, SingleChannel, Unbuffered);
+device_support!(new_mcp4811, Resolution10Bit, SingleChannel, Unbuffered);
+device_support!(new_mcp4801, Resolution8Bit, SingleChannel, Unbuffered);
+
+device_support!(new_mcp4822, Resolution12Bit, DualChannel, Unbuffered);
+device_support!(new_mcp4812, Resolution10Bit, DualChannel, Unbuffered);
+device_support!(new_mcp4802, Resolution8Bit, DualChannel, Unbuffered);
+
 #[macro_export]
 macro_rules! test {
     ($name:ident, $create:ident, $cmd:expr, $value:expr ) => {
@@ -71,7 +79,7 @@ fn can_fail() {
     assert_error!(result, InvalidValue);
 }
 
-macro_rules! for_all_ics {
+macro_rules! for_all_ics_with_buffering {
     ($name:ident) => {
         mod $name {
             use super::*;
@@ -85,6 +93,40 @@ macro_rules! for_all_ics {
     };
 }
 
+macro_rules! for_all_ics_without_buffering {
+    ($name:ident) => {
+        mod $name {
+            use super::*;
+            $name!(for_mcp4801, new_mcp4801);
+            $name!(for_mcp4802, new_mcp4802);
+            $name!(for_mcp4811, new_mcp4811);
+            $name!(for_mcp4812, new_mcp4812);
+            $name!(for_mcp4821, new_mcp4821);
+            $name!(for_mcp4822, new_mcp4822);
+        }
+    };
+}
+
+macro_rules! for_all_ics {
+    ($name:ident) => {
+        mod $name {
+            use super::*;
+            $name!(for_mcp4901, new_mcp4901);
+            $name!(for_mcp4902, new_mcp4902);
+            $name!(for_mcp4911, new_mcp4911);
+            $name!(for_mcp4912, new_mcp4912);
+            $name!(for_mcp4921, new_mcp4921);
+            $name!(for_mcp4922, new_mcp4922);
+            $name!(for_mcp4801, new_mcp4801);
+            $name!(for_mcp4802, new_mcp4802);
+            $name!(for_mcp4811, new_mcp4811);
+            $name!(for_mcp4812, new_mcp4812);
+            $name!(for_mcp4821, new_mcp4821);
+            $name!(for_mcp4822, new_mcp4822);
+        }
+    };
+}
+
 macro_rules! for_all_single_channel_ics {
     ($name:ident, $macroname:ident $(, $arg:expr)*) => {
         mod $name {
@@ -92,6 +134,9 @@ macro_rules! for_all_single_channel_ics {
             $macroname!(for_mcp4901, new_mcp4901 $(, $arg)*);
             $macroname!(for_mcp4911, new_mcp4911 $(, $arg)*);
             $macroname!(for_mcp4921, new_mcp4921 $(, $arg)*);
+            $macroname!(for_mcp4801, new_mcp4801 $(, $arg)*);
+            $macroname!(for_mcp4811, new_mcp4811 $(, $arg)*);
+            $macroname!(for_mcp4821, new_mcp4821 $(, $arg)*);
         }
     };
 }
@@ -103,6 +148,9 @@ macro_rules! for_all_dual_channel_ics {
             $macroname!(for_mcp4902, new_mcp4902 $(, $arg)*);
             $macroname!(for_mcp4912, new_mcp4912 $(, $arg)*);
             $macroname!(for_mcp4922, new_mcp4922 $(, $arg)*);
+            $macroname!(for_mcp4802, new_mcp4802 $(, $arg)*);
+            $macroname!(for_mcp4812, new_mcp4812 $(, $arg)*);
+            $macroname!(for_mcp4822, new_mcp4822 $(, $arg)*);
         }
     };
 }
@@ -113,6 +161,8 @@ macro_rules! for_all_12bit_ics {
             use super::*;
             $macroname!(for_mcp4921, new_mcp4921 $(, $arg)*);
             $macroname!(for_mcp4922, new_mcp4922 $(, $arg)*);
+            $macroname!(for_mcp4821, new_mcp4821 $(, $arg)*);
+            $macroname!(for_mcp4822, new_mcp4822 $(, $arg)*);
         }
     };
 }
@@ -123,6 +173,8 @@ macro_rules! for_all_10bit_ics {
             use super::*;
             $macroname!(for_mcp4911, new_mcp4911 $(, $arg)*);
             $macroname!(for_mcp4912, new_mcp4912 $(, $arg)*);
+            $macroname!(for_mcp4811, new_mcp4811 $(, $arg)*);
+            $macroname!(for_mcp4812, new_mcp4812 $(, $arg)*);
         }
     };
 }
@@ -133,6 +185,8 @@ macro_rules! for_all_8bit_ics {
             use super::*;
             $macroname!(for_mcp4901, new_mcp4901 $(, $arg)*);
             $macroname!(for_mcp4902, new_mcp4902 $(, $arg)*);
+            $macroname!(for_mcp4801, new_mcp4801 $(, $arg)*);
+            $macroname!(for_mcp4802, new_mcp4802 $(, $arg)*);
         }
     };
 }
@@ -167,23 +221,6 @@ macro_rules! common {
 }
 
 for_all_ics!(common);
-
-macro_rules! buffered {
-    ($name:ident, $create:ident) => {
-        mod $name {
-            use super::*;
-
-            test!(
-                send_buffered,
-                $create,
-                Command::default().buffered(),
-                0b0111_0000_0000_0000
-            );
-        }
-    };
-}
-
-for_all_ics!(buffered);
 
 macro_rules! send_value_test {
     ($name:ident, $create:ident, $value:expr, $expected_value:expr) => {
@@ -273,3 +310,38 @@ macro_rules! send_channel1_test {
 }
 
 for_all_dual_channel_ics!(send_channel1, send_channel1_test);
+
+macro_rules! invalid_buffering_test {
+    ($name:ident, $create:ident) => {
+        mod $name {
+            use super::*;
+            #[test]
+            fn cannot_send_buffered() {
+                let mut dev = $create(&[]);
+                assert_error!(
+                    dev.send(Command::default().buffered()),
+                    BufferingNotSupported
+                );
+                dev.destroy().0.done();
+            }
+        }
+    };
+}
+
+for_all_ics_without_buffering!(invalid_buffering_test);
+
+macro_rules! send_buffered_test {
+    ($name:ident, $create:ident) => {
+        mod $name {
+            use super::*;
+            test!(
+                send_buffered,
+                $create,
+                Command::default().buffered(),
+                0b0111_0000_0000_0000
+            );
+        }
+    };
+}
+
+for_all_ics_with_buffering!(send_buffered_test);

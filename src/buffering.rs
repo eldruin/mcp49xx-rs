@@ -10,3 +10,13 @@ impl<E> BufferingSupport<E> for marker::Buffered {
         Ok(())
     }
 }
+
+impl<E> BufferingSupport<E> for marker::Unbuffered {
+    fn check_buffering_is_appropriate(buffered: bool) -> Result<(), Error<E>> {
+        if buffered {
+            Err(Error::BufferingNotSupported)
+        } else {
+            Ok(())
+        }
+    }
+}

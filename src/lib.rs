@@ -50,10 +50,12 @@ use hal::spi::{Mode, Phase, Polarity};
 pub enum Error<E> {
     /// Communication error
     Comm(E),
-    /// The channel provided is not available in the current device
+    /// The channel provided is not available in the current device (MCP4xx1)
     InvalidChannel,
     /// The value provided does not fit the bitness of the current device
     InvalidValue,
+    /// Buffering is not available in the current device (MCP48xx)
+    BufferingNotSupported,
 }
 
 /// SPI mode
@@ -105,6 +107,8 @@ pub mod marker {
 
     /// Device supports buffered commands
     pub struct Buffered(());
+    /// Device does not support buffered commands
+    pub struct Unbuffered(());
 }
 
 impl<DI, RES, CH, BUF, E> Mcp49x<DI, RES, CH, BUF>
@@ -160,4 +164,5 @@ mod private {
     impl Sealed for marker::DualChannel {}
 
     impl Sealed for marker::Buffered {}
+    impl Sealed for marker::Unbuffered {}
 }
