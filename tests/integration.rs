@@ -70,9 +70,75 @@ fn can_fail() {
     assert_error!(result, InvalidValue);
 }
 
-macro_rules! ic_test {
-    ($ic:ident, $create:ident, $value:expr, $expected_value:expr, $too_big_value:expr) => {
-        mod $ic {
+macro_rules! for_all_ics {
+    ($name:ident) => {
+        mod $name {
+            use super::*;
+            $name!(for_mcp4901, new_mcp4901);
+            $name!(for_mcp4902, new_mcp4902);
+            $name!(for_mcp4911, new_mcp4911);
+            $name!(for_mcp4912, new_mcp4912);
+            $name!(for_mcp4921, new_mcp4921);
+            $name!(for_mcp4922, new_mcp4922);
+        }
+    };
+}
+
+macro_rules! for_all_single_channel_ics {
+    ($name:ident, $macroname:ident $(, $arg:expr)*) => {
+        mod $name {
+            use super::*;
+            $macroname!(for_mcp4901, new_mcp4901 $(, $arg)*);
+            $macroname!(for_mcp4911, new_mcp4911 $(, $arg)*);
+            $macroname!(for_mcp4921, new_mcp4921 $(, $arg)*);
+        }
+    };
+}
+
+macro_rules! for_all_dual_channel_ics {
+    ($name:ident, $macroname:ident $(, $arg:expr)*) => {
+        mod $name {
+            use super::*;
+            $macroname!(for_mcp4902, new_mcp4902 $(, $arg)*);
+            $macroname!(for_mcp4912, new_mcp4912 $(, $arg)*);
+            $macroname!(for_mcp4922, new_mcp4922 $(, $arg)*);
+        }
+    };
+}
+
+macro_rules! for_all_12bit_ics {
+    ($name:ident, $macroname:ident $(, $arg:expr)*) => {
+        mod $name {
+            use super::*;
+            $macroname!(for_mcp4921, new_mcp4921 $(, $arg)*);
+            $macroname!(for_mcp4922, new_mcp4922 $(, $arg)*);
+        }
+    };
+}
+
+macro_rules! for_all_10bit_ics {
+    ($name:ident, $macroname:ident $(, $arg:expr)*) => {
+        mod $name {
+            use super::*;
+            $macroname!(for_mcp4911, new_mcp4911 $(, $arg)*);
+            $macroname!(for_mcp4912, new_mcp4912 $(, $arg)*);
+        }
+    };
+}
+
+macro_rules! for_all_8bit_ics {
+    ($name:ident, $macroname:ident $(, $arg:expr)*) => {
+        mod $name {
+            use super::*;
+            $macroname!(for_mcp4901, new_mcp4901 $(, $arg)*);
+            $macroname!(for_mcp4902, new_mcp4902 $(, $arg)*);
+        }
+    };
+}
+
+macro_rules! common {
+    ($name:ident, $create:ident) => {
+        mod $name {
             use super::*;
 
             test!(
@@ -81,23 +147,6 @@ macro_rules! ic_test {
                 Command::default(),
                 0b0011_0000_0000_0000
             );
-
-            test!(
-                send_value,
-                $create,
-                Command::default().value($value),
-                $expected_value
-            );
-
-            #[test]
-            fn cannot_send_invalid_value() {
-                let mut dev = $create(&[]);
-                assert_error!(
-                    dev.send(Command::default().value($too_big_value)),
-                    InvalidValue
-                );
-                dev.destroy().0.done();
-            }
 
             test!(
                 send_shutdown,
@@ -123,12 +172,66 @@ macro_rules! ic_test {
     };
 }
 
-macro_rules! single_channel_ic_test {
-    ($ic:ident, $create:ident, $value:expr, $expected_value:expr, $too_big_value:expr) => {
-        mod $ic {
-            use super::*;
-            ic_test!(common, $create, $value, $expected_value, $too_big_value);
+for_all_ics!(common);
 
+macro_rules! send_value_test {
+    ($name:ident, $create:ident, $value:expr, $expected_value:expr) => {
+        mod $name {
+            use super::*;
+            test!(
+                send_value,
+                $create,
+                Command::default().value($value),
+                $expected_value
+            );
+        }
+    };
+}
+
+for_all_12bit_ics!(
+    send_value_12bit,
+    send_value_test,
+    0b0000_1010_1010_1011,
+    0b0011_1010_1010_1011
+);
+for_all_10bit_ics!(
+    send_value_10bit,
+    send_value_test,
+    0b0000_0010_1010_1011,
+    0b0011_1010_1010_1100
+);
+for_all_8bit_ics!(
+    send_value_8bit,
+    send_value_test,
+    0b0000_0000_1010_1011,
+    0b0011_1010_1011_0000
+);
+
+macro_rules! invalid_value_test {
+    ($name:ident, $create:ident, $too_big_value:expr) => {
+        mod $name {
+            use super::*;
+            #[test]
+            fn cannot_send_invalid_value() {
+                let mut dev = $create(&[]);
+                assert_error!(
+                    dev.send(Command::default().value($too_big_value)),
+                    InvalidValue
+                );
+                dev.destroy().0.done();
+            }
+        }
+    };
+}
+
+for_all_12bit_ics!(invalid_value_12bit, invalid_value_test, 1 << 12);
+for_all_10bit_ics!(invalid_value_10bit, invalid_value_test, 1 << 10);
+for_all_8bit_ics!(invalid_value_8bit, invalid_value_test, 1 << 8);
+
+macro_rules! invalid_channel_test {
+    ($name:ident, $create:ident) => {
+        mod $name {
+            use super::*;
             #[test]
             fn cannot_send_invalid_channel() {
                 let mut dev = $create(&[]);
@@ -142,12 +245,12 @@ macro_rules! single_channel_ic_test {
     };
 }
 
-macro_rules! dual_channel_ic_test {
-    ($ic:ident, $create:ident, $value:expr, $expected_value:expr, $too_big_value:expr) => {
-        mod $ic {
-            use super::*;
-            ic_test!(common, $create, $value, $expected_value, $too_big_value);
+for_all_single_channel_ics!(invalid_channel, invalid_channel_test);
 
+macro_rules! send_channel1_test {
+    ($name:ident, $create:ident) => {
+        mod $name {
+            use super::*;
             test!(
                 send_channel1,
                 $create,
@@ -158,51 +261,4 @@ macro_rules! dual_channel_ic_test {
     };
 }
 
-
-single_channel_ic_test!(
-    mcp4921,
-    new_mcp4921,
-    0b0000_1010_1010_1010,
-    0b0011_1010_1010_1010,
-    1 << 12
-);
-
-single_channel_ic_test!(
-    mcp4911,
-    new_mcp4911,
-    0b0000_0010_1010_1011,
-    0b0011_1010_1010_1100,
-    1 << 10
-);
-
-single_channel_ic_test!(
-    mcp4901,
-    new_mcp4901,
-    0b0000_0000_1010_1011,
-    0b0011_1010_1011_0000,
-    1 << 9
-);
-
-dual_channel_ic_test!(
-    mcp4922,
-    new_mcp4922,
-    0b0000_1010_1010_1010,
-    0b0011_1010_1010_1010,
-    1 << 12
-);
-
-dual_channel_ic_test!(
-    mcp4912,
-    new_mcp4912,
-    0b0000_0010_1010_1011,
-    0b0011_1010_1010_1100,
-    1 << 10
-);
-
-dual_channel_ic_test!(
-    mcp4902,
-    new_mcp4902,
-    0b0000_0000_1010_1011,
-    0b0011_1010_1011_0000,
-    1 << 9
-);
+for_all_dual_channel_ics!(send_channel1, send_channel1_test);
