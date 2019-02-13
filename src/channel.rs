@@ -14,3 +14,9 @@ impl<E> ChannelSupport<E> for marker::SingleChannel {
         }
     }
 }
+
+impl<E> ChannelSupport<E> for marker::DualChannel {
+    fn check_channel_is_appropriate(_channel: Channel) -> Result<(), Error<E>> {
+        Ok(())
+    }
+}

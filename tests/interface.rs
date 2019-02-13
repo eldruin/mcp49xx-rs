@@ -28,6 +28,10 @@ device_support!(new_mcp4921, Resolution12Bit, SingleChannel);
 device_support!(new_mcp4911, Resolution10Bit, SingleChannel);
 device_support!(new_mcp4901, Resolution8Bit, SingleChannel);
 
+device_support!(new_mcp4922, Resolution12Bit, DualChannel);
+device_support!(new_mcp4912, Resolution10Bit, DualChannel);
+device_support!(new_mcp4902, Resolution8Bit, DualChannel);
+
 #[macro_export]
 macro_rules! test {
     ($name:ident, $create:ident, $cmd:expr, $value:expr ) => {
@@ -95,16 +99,6 @@ macro_rules! ic_test {
                 dev.destroy().0.done();
             }
 
-            #[test]
-            fn cannot_send_invalid_channel() {
-                let mut dev = $create(&[]);
-                assert_error!(
-                    dev.send(Command::default().channel(Channel::Ch1)),
-                    InvalidChannel
-                );
-                dev.destroy().0.done();
-            }
-
             test!(
                 send_shutdown,
                 $create,
@@ -148,6 +142,23 @@ macro_rules! single_channel_ic_test {
     };
 }
 
+macro_rules! dual_channel_ic_test {
+    ($ic:ident, $create:ident, $value:expr, $expected_value:expr, $too_big_value:expr) => {
+        mod $ic {
+            use super::*;
+            ic_test!(common, $create, $value, $expected_value, $too_big_value);
+
+            test!(
+                send_channel1,
+                $create,
+                Command::default().channel(Channel::Ch1),
+                0b1011_0000_0000_0000
+            );
+        }
+    };
+}
+
+
 single_channel_ic_test!(
     mcp4921,
     new_mcp4921,
@@ -167,6 +178,30 @@ single_channel_ic_test!(
 single_channel_ic_test!(
     mcp4901,
     new_mcp4901,
+    0b0000_0000_1010_1011,
+    0b0011_1010_1011_0000,
+    1 << 9
+);
+
+dual_channel_ic_test!(
+    mcp4922,
+    new_mcp4922,
+    0b0000_1010_1010_1010,
+    0b0011_1010_1010_1010,
+    1 << 12
+);
+
+dual_channel_ic_test!(
+    mcp4912,
+    new_mcp4912,
+    0b0000_0010_1010_1011,
+    0b0011_1010_1010_1100,
+    1 << 10
+);
+
+dual_channel_ic_test!(
+    mcp4902,
+    new_mcp4902,
     0b0000_0000_1010_1011,
     0b0011_1010_1011_0000,
     1 << 9

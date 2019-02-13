@@ -35,6 +35,9 @@ macro_rules! impl_create_destroy {
     };
 }
 
-impl_create_destroy!("MCP4921", new_mcp4921, Resolution12Bit, SingleChannel);
-impl_create_destroy!("MCP4911", new_mcp4911, Resolution10Bit, SingleChannel);
 impl_create_destroy!("MCP4901", new_mcp4901, Resolution8Bit, SingleChannel);
+impl_create_destroy!("MCP4902", new_mcp4902, Resolution8Bit, DualChannel);
+impl_create_destroy!("MCP4911", new_mcp4911, Resolution10Bit, SingleChannel);
+impl_create_destroy!("MCP4912", new_mcp4912, Resolution10Bit, DualChannel);
+impl_create_destroy!("MCP4921", new_mcp4921, Resolution12Bit, SingleChannel);
+impl_create_destroy!("MCP4922", new_mcp4922, Resolution12Bit, DualChannel);

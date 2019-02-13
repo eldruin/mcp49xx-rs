@@ -99,6 +99,9 @@ pub mod marker {
 
     /// Single channel device
     pub struct SingleChannel(());
+
+    /// Dual channel device
+    pub struct DualChannel(());
 }
 
 impl<DI, RES, CH, E> Mcp49x<DI, RES, CH>
@@ -145,4 +148,5 @@ mod private {
     impl Sealed for marker::Resolution8Bit {}
 
     impl Sealed for marker::SingleChannel {}
+    impl Sealed for marker::DualChannel {}
 }
