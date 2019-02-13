@@ -82,10 +82,11 @@ impl Default for Channel {
 
 /// MCP49x digital potentiometer driver
 #[derive(Debug, Default)]
-pub struct Mcp49x<DI, RES, CH> {
+pub struct Mcp49x<DI, RES, CH, BUF> {
     iface: DI,
     _resolution: PhantomData<RES>,
     _channels: PhantomData<CH>,
+    _buffering: PhantomData<BUF>,
 }
 
 /// Markers
@@ -99,16 +100,19 @@ pub mod marker {
 
     /// Single channel device
     pub struct SingleChannel(());
-
     /// Dual channel device
     pub struct DualChannel(());
+
+    /// Device supports buffered commands
+    pub struct Buffered(());
 }
 
-impl<DI, RES, CH, E> Mcp49x<DI, RES, CH>
+impl<DI, RES, CH, BUF, E> Mcp49x<DI, RES, CH, BUF>
 where
     DI: interface::WriteCommand<Error = E>,
     RES: ResolutionSupport<E>,
     CH: ChannelSupport<E>,
+    BUF: BufferingSupport<E>,
 {
     /// Send command to device.
     ///
@@ -120,6 +124,7 @@ where
     pub fn send(&mut self, command: Command) -> Result<(), Error<E>> {
         CH::check_channel_is_appropriate(command.channel)?;
         RES::check_value_is_appropriate(command.value)?;
+        BUF::check_buffering_is_appropriate(command.buffered)?;
         let value = RES::get_value_for_spi(command.value);
         self.iface
             .write_command(command.get_config_bits() | value[0], value[1])
@@ -137,16 +142,22 @@ pub use resolution::ResolutionSupport;
 mod channel;
 #[doc(hidden)]
 pub use channel::ChannelSupport;
+mod buffering;
+#[doc(hidden)]
+pub use buffering::BufferingSupport;
 
 mod private {
     use super::{interface, marker};
     pub trait Sealed {}
 
     impl<SPI, CS> Sealed for interface::SpiInterface<SPI, CS> {}
+
     impl Sealed for marker::Resolution12Bit {}
     impl Sealed for marker::Resolution10Bit {}
     impl Sealed for marker::Resolution8Bit {}
 
     impl Sealed for marker::SingleChannel {}
     impl Sealed for marker::DualChannel {}
+
+    impl Sealed for marker::Buffered {}
 }

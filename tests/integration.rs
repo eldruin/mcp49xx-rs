@@ -11,26 +11,27 @@ impl embedded_hal::digital::OutputPin for DummyOutputPin {
 }
 
 macro_rules! device_support {
-    ($create:ident, $resolution:ident, $channels:ident) => {
+    ($create:ident, $resolution:ident, $channels:ident, $buffering:ident) => {
         pub fn $create(
             transactions: &[SpiTrans],
         ) -> Mcp49x<
             interface::SpiInterface<SpiMock, DummyOutputPin>,
             marker::$resolution,
             marker::$channels,
+            marker::$buffering,
         > {
             Mcp49x::$create(SpiMock::new(&transactions), DummyOutputPin)
         }
     };
 }
 
-device_support!(new_mcp4921, Resolution12Bit, SingleChannel);
-device_support!(new_mcp4911, Resolution10Bit, SingleChannel);
-device_support!(new_mcp4901, Resolution8Bit, SingleChannel);
+device_support!(new_mcp4921, Resolution12Bit, SingleChannel, Buffered);
+device_support!(new_mcp4911, Resolution10Bit, SingleChannel, Buffered);
+device_support!(new_mcp4901, Resolution8Bit, SingleChannel, Buffered);
 
-device_support!(new_mcp4922, Resolution12Bit, DualChannel);
-device_support!(new_mcp4912, Resolution10Bit, DualChannel);
-device_support!(new_mcp4902, Resolution8Bit, DualChannel);
+device_support!(new_mcp4922, Resolution12Bit, DualChannel, Buffered);
+device_support!(new_mcp4912, Resolution10Bit, DualChannel, Buffered);
+device_support!(new_mcp4902, Resolution8Bit, DualChannel, Buffered);
 
 #[macro_export]
 macro_rules! test {

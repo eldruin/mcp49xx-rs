@@ -1,7 +1,7 @@
 use core::marker::PhantomData;
 use {interface, marker, Mcp49x};
 
-impl<SPI, CS, RES, CH> Mcp49x<interface::SpiInterface<SPI, CS>, RES, CH> {
+impl<SPI, CS, RES, CH, BUF> Mcp49x<interface::SpiInterface<SPI, CS>, RES, CH, BUF> {
     /// Destroy driver instance, return SPI bus instance and CS output pin.
     pub fn destroy(self) -> (SPI, CS) {
         (self.iface.spi, self.iface.cs)
@@ -9,16 +9,21 @@ impl<SPI, CS, RES, CH> Mcp49x<interface::SpiInterface<SPI, CS>, RES, CH> {
 }
 
 macro_rules! impl_create_destroy {
-    ($dev:expr, $create:ident, $resolution:ident, $channels:ident) => {
+    ($dev:expr, $create:ident, $resolution:ident, $channels:ident, $buffering:ident) => {
         impl_create_destroy! {
-            @gen [$create, $resolution, $channels,
+            @gen [$create, $resolution, $channels, $buffering,
                 concat!("Create a new instance of a ", $dev, " device.")]
         }
     };
 
-    ( @gen [$create:ident, $resolution:ident, $channels:ident, $doc:expr] ) => {
+    ( @gen [$create:ident, $resolution:ident, $channels:ident, $buffering:ident, $doc:expr] ) => {
         impl<SPI, CS>
-            Mcp49x<interface::SpiInterface<SPI, CS>, marker::$resolution, marker::$channels>
+            Mcp49x<
+                interface::SpiInterface<SPI, CS>,
+                marker::$resolution,
+                marker::$channels,
+                marker::$buffering,
+            >
         {
             #[doc = $doc]
             pub fn $create(spi: SPI, chip_select: CS) -> Self {
@@ -29,15 +34,52 @@ macro_rules! impl_create_destroy {
                     },
                     _resolution: PhantomData,
                     _channels: PhantomData,
+                    _buffering: PhantomData,
                 }
             }
         }
     };
 }
 
-impl_create_destroy!("MCP4901", new_mcp4901, Resolution8Bit, SingleChannel);
-impl_create_destroy!("MCP4902", new_mcp4902, Resolution8Bit, DualChannel);
-impl_create_destroy!("MCP4911", new_mcp4911, Resolution10Bit, SingleChannel);
-impl_create_destroy!("MCP4912", new_mcp4912, Resolution10Bit, DualChannel);
-impl_create_destroy!("MCP4921", new_mcp4921, Resolution12Bit, SingleChannel);
-impl_create_destroy!("MCP4922", new_mcp4922, Resolution12Bit, DualChannel);
+impl_create_destroy!(
+    "MCP4901",
+    new_mcp4901,
+    Resolution8Bit,
+    SingleChannel,
+    Buffered
+);
+impl_create_destroy!(
+    "MCP4902",
+    new_mcp4902,
+    Resolution8Bit,
+    DualChannel,
+    Buffered
+);
+impl_create_destroy!(
+    "MCP4911",
+    new_mcp4911,
+    Resolution10Bit,
+    SingleChannel,
+    Buffered
+);
+impl_create_destroy!(
+    "MCP4912",
+    new_mcp4912,
+    Resolution10Bit,
+    DualChannel,
+    Buffered
+);
+impl_create_destroy!(
+    "MCP4921",
+    new_mcp4921,
+    Resolution12Bit,
+    SingleChannel,
+    Buffered
+);
+impl_create_destroy!(
+    "MCP4922",
+    new_mcp4922,
+    Resolution12Bit,
+    DualChannel,
+    Buffered
+);

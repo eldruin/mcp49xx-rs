@@ -4,7 +4,7 @@ use super::Channel;
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Command {
     pub(crate) channel: Channel,
-    buffered: bool,
+    pub(crate) buffered: bool,
     double_gain: bool,
     shutdown: bool,
     pub(crate) value: u16,
