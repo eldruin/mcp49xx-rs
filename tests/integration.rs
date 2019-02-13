@@ -161,6 +161,16 @@ macro_rules! common {
                 Command::default().double_gain(),
                 0b0001_0000_0000_0000
             );
+        }
+    };
+}
+
+for_all_ics!(common);
+
+macro_rules! buffered {
+    ($name:ident, $create:ident) => {
+        mod $name {
+            use super::*;
 
             test!(
                 send_buffered,
@@ -172,7 +182,7 @@ macro_rules! common {
     };
 }
 
-for_all_ics!(common);
+for_all_ics!(buffered);
 
 macro_rules! send_value_test {
     ($name:ident, $create:ident, $value:expr, $expected_value:expr) => {
