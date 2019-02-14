@@ -57,6 +57,13 @@
 //! - [MCP49x1](http://ww1.microchip.com/downloads/en/DeviceDoc/22248a.pdf)
 //! - [MCP49x2](http://ww1.microchip.com/downloads/en/DeviceDoc/22250A.pdf)
 //!
+//! ## The interface
+//!
+//! These devices support changing all configuration flags in each command
+//! sent. In order to keep this flexibility, this driver does not provide
+//! individual methods to set the settings but provides a `Command` struct
+//! which can be used to specify all settings.
+//! Then commands can be sent to the device through the `send()` method.
 //!
 //! ## Usage
 //! TODO
