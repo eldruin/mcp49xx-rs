@@ -10,11 +10,11 @@
 //! - Select gain.
 //!
 //! ## The devices
-//! The Microchip Technology Inc. MCP49xx devices are single/dual channel 8-bit,
-//! 10-bit and 12-bit buffered voltage output Digital-to-Analog Converters
-//! (DACs). The devices operate from a single 2.7V to 5.5V supply with an SPI
-//! compatible Serial Peripheral Interface. The user can configure the
-//! full-scale range of the device to be Vref or 2*Vref by setting the gain
+//! The Microchip Technology Inc. MCP49xx and MCP48xx devices are single/dual
+//! channel 8-bit, 10-bit and 12-bit buffered voltage output Digital-to-Analog
+//! Converters (DACs). The devices operate from a single 2.7V to 5.5V supply
+//! with an SPI compatible Serial Peripheral Interface. The user can configure
+//! the full-scale range of the device to be Vref or 2*Vref by setting the gain
 //! selection option bit (gain of 1 of 2).
 //!
 //! The user can shut down the device by setting the Configuration Register bit.
