@@ -34,9 +34,23 @@
 //! and industrial applications where calibration or compensation of signals
 //! (such as temperature, pressure and humidity) are required.
 //!
-//! This driver should be compatible at least with the devices:
+//! This driver should be compatible with these devices:
 //!
-//! TODO compatible devices table with characteristics and datasheets: MCP48xx, MCP49xx
+//! | Device  | Resolution | Channels | Buffering     |
+//! |---------|------------|----------|---------------|
+//! | MCP4801 | 8-bit      | 1        | Not supported |
+//! | MCP4802 | 8-bit      | 2        | Not supported |
+//! | MCP4811 | 10-bit     | 1        | Not supported |
+//! | MCP4812 | 10-bit     | 2        | Not supported |
+//! | MCP4821 | 12-bit     | 1        | Not supported |
+//! | MCP4822 | 12-bit     | 2        | Not supported |
+//! | MCP4901 | 8-bit      | 1        | Supported     |
+//! | MCP4902 | 8-bit      | 2        | Supported     |
+//! | MCP4911 | 10-bit     | 1        | Supported     |
+//! | MCP4912 | 10-bit     | 2        | Supported     |
+//! | MCP4921 | 12-bit     | 1        | Supported     |
+//! | MCP4922 | 12-bit     | 2        | Supported     |
+//!
 //!
 //! ## Usage
 //! TODO
