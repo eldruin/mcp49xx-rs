@@ -51,6 +51,12 @@
 //! | MCP4921 | 12-bit     | 1        | Supported     |
 //! | MCP4922 | 12-bit     | 2        | Supported     |
 //!
+//! Datasheets:
+//! - [MCP48x1](http://ww1.microchip.com/downloads/en/DeviceDoc/22244B.pdf)
+//! - [MCP48x2](http://ww1.microchip.com/downloads/en/DeviceDoc/20002249B.pdf)
+//! - [MCP49x1](http://ww1.microchip.com/downloads/en/DeviceDoc/22248a.pdf)
+//! - [MCP49x2](http://ww1.microchip.com/downloads/en/DeviceDoc/22250A.pdf)
+//!
 //!
 //! ## Usage
 //! TODO
