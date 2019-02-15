@@ -88,10 +88,16 @@ pub enum Error<E> {
     BufferingNotSupported,
 }
 
-/// SPI mode
-pub const MODE: Mode = Mode {
+/// SPI mode (CPOL = 0, CPHA = 0)
+pub const MODE0: Mode = Mode {
     phase: Phase::CaptureOnFirstTransition,
     polarity: Polarity::IdleLow,
+};
+
+/// SPI mode (CPOL = 1, CPHA = 1)
+pub const MODE1: Mode = Mode {
+    phase: Phase::CaptureOnSecondTransition,
+    polarity: Polarity::IdleHigh,
 };
 
 /// Channel selector
