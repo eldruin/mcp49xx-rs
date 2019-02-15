@@ -153,6 +153,7 @@ where
     /// This will return an error if the command is not appropriate for the current device:
     /// - If the channel is not available it will return `Error::InvalidChannel`.
     /// - If the value is too big it will return `Error::InvalidValue`.
+    /// - If buffering is not supported it will return `Error::BufferingNotSupported`.
     ///
     /// Otherwise if a communication error happened it will return `Error::Comm`.
     pub fn send(&mut self, command: Command) -> Result<(), Error<E>> {
