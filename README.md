@@ -42,9 +42,28 @@ The devices provide high accuracy and low noise performance for consumer
 and industrial applications where calibration or compensation of signals
 (such as temperature, pressure and humidity) are required.
 
-This driver should be compatible at least with the devices:
+This driver is compatible with these devices:
 
-TODO compatible devices table with characteristics and datasheets: MCP48xx, MCP49xx
+| Device  | Resolution | Channels | Buffering     |
+|---------|------------|----------|---------------|
+| MCP4801 | 8-bit      | 1        | Not supported |
+| MCP4802 | 8-bit      | 2        | Not supported |
+| MCP4811 | 10-bit     | 1        | Not supported |
+| MCP4812 | 10-bit     | 2        | Not supported |
+| MCP4821 | 12-bit     | 1        | Not supported |
+| MCP4822 | 12-bit     | 2        | Not supported |
+| MCP4901 | 8-bit      | 1        | Supported     |
+| MCP4902 | 8-bit      | 2        | Supported     |
+| MCP4911 | 10-bit     | 1        | Supported     |
+| MCP4912 | 10-bit     | 2        | Supported     |
+| MCP4921 | 12-bit     | 1        | Supported     |
+| MCP4922 | 12-bit     | 2        | Supported     |
+
+Datasheets:
+- [MCP48x1](http://ww1.microchip.com/downloads/en/DeviceDoc/22244B.pdf)
+- [MCP48x2](http://ww1.microchip.com/downloads/en/DeviceDoc/20002249B.pdf)
+- [MCP49x1](http://ww1.microchip.com/downloads/en/DeviceDoc/22248a.pdf)
+- [MCP49x2](http://ww1.microchip.com/downloads/en/DeviceDoc/22250A.pdf)
 
 ## Usage
 
@@ -54,7 +73,7 @@ In the following examples an instance of the device MCP4921 will be created
 as an example. Other devices can be created with similar methods like:
 `Mcp49xx::new_mcp4822(...)`.
 
-Please find additional examples in this repository: [driver-examples]
+Please find additional examples using hardware in this repository: [driver-examples]
 
 [driver-examples]: https://github.com/eldruin/driver-examples
 
