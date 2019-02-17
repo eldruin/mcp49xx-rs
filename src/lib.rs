@@ -197,12 +197,6 @@ pub enum Channel {
     Ch1,
 }
 
-impl Default for Channel {
-    fn default() -> Self {
-        Channel::Ch0
-    }
-}
-
 /// MCP49xx digital potentiometer driver
 #[derive(Debug, Default)]
 pub struct Mcp49xx<DI, RES, CH, BUF> {
