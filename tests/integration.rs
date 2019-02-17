@@ -1,5 +1,5 @@
-extern crate mcp49x;
-use mcp49x::{Channel, Command, Error};
+extern crate mcp49xx;
+use mcp49xx::{Channel, Command, Error};
 extern crate embedded_hal_mock as hal;
 use self::hal::spi::Transaction as SpiTrans;
 mod base;

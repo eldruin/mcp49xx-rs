@@ -118,9 +118,9 @@ impl Default for Channel {
     }
 }
 
-/// MCP49x digital potentiometer driver
+/// MCP49xx digital potentiometer driver
 #[derive(Debug, Default)]
-pub struct Mcp49x<DI, RES, CH, BUF> {
+pub struct Mcp49xx<DI, RES, CH, BUF> {
     iface: DI,
     _resolution: PhantomData<RES>,
     _channels: PhantomData<CH>,
@@ -147,7 +147,7 @@ pub mod marker {
     pub struct Unbuffered(());
 }
 
-impl<DI, RES, CH, BUF, E> Mcp49x<DI, RES, CH, BUF>
+impl<DI, RES, CH, BUF, E> Mcp49xx<DI, RES, CH, BUF>
 where
     DI: interface::WriteCommand<Error = E>,
     RES: ResolutionSupport<E>,

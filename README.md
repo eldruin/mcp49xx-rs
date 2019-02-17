@@ -1,9 +1,9 @@
 # Rust MCP49x digital-to-analog converter (DAC) driver
 
-[![crates.io](https://img.shields.io/crates/v/mcp49x.svg)](https://crates.io/crates/mcp49x)
-[![Docs](https://docs.rs/mcp49x/badge.svg)](https://docs.rs/mcp49x)
-[![Build Status](https://travis-ci.org/eldruin/mcp49x-rs.svg?branch=master)](https://travis-ci.org/eldruin/mcp49x-rs)
-[![Coverage Status](https://coveralls.io/repos/github/eldruin/mcp49x-rs/badge.svg?branch=master)](https://coveralls.io/github/eldruin/mcp49x-rs?branch=master)
+[![crates.io](https://img.shields.io/crates/v/mcp49xx.svg)](https://crates.io/crates/mcp49xx)
+[![Docs](https://docs.rs/mcp49xx/badge.svg)](https://docs.rs/mcp49xx)
+[![Build Status](https://travis-ci.org/eldruin/mcp49xx-rs.svg?branch=master)](https://travis-ci.org/eldruin/mcp49xx-rs)
+[![Coverage Status](https://coveralls.io/repos/github/eldruin/mcp49xx-rs/badge.svg?branch=master)](https://coveralls.io/github/eldruin/mcp49xx-rs?branch=master)
 ![Maintenance Intention](https://img.shields.io/badge/maintenance-actively--developed-brightgreen.svg)
 
 This is a platform-agnostic Rust driver for the MCP49xx and MCP48xx SPI
@@ -49,7 +49,7 @@ To use this driver, import this crate and an `embedded_hal` implementation,
 then instantiate the appropriate device.
 In the following examples an instance of the device MCP4921 will be created
 as an example. Other devices can be created with similar methods like:
-`Mcp49x::new_mcp4822(...)`.
+`Mcp49xx::new_mcp4822(...)`.
 
 Please find additional examples in this repository: [driver-examples]
 
@@ -58,15 +58,15 @@ Please find additional examples in this repository: [driver-examples]
 ```rust
 extern crate embedded_hal;
 extern crate linux_embedded_hal;
-extern crate mcp49x;
+extern crate mcp49xx;
 
 use linux_embedded_hal::{Pin, Spidev};
-use mcp49x::{Command, Mcp49x};
+use mcp49xx::{Command, Mcp49xx};
 
 fn main() {
     let spi = Spidev::open("/dev/spidev0.0").unwrap();
     let cs = Pin::new(25);
-    let mut mcp4921 = Mcp49x::new_mcp4921(spi, cs);
+    let mut mcp4921 = Mcp49xx::new_mcp4921(spi, cs);
 
     let cmd = Command::default();
     let cmd = cmd.double_gain().value(50);

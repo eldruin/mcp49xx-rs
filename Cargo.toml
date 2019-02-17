@@ -1,15 +1,15 @@
 [package]
-name = "mcp49x"
+name = "mcp49xx"
 version = "0.1.0"
 authors = ["Diego Barrios Romero <eldruin@gmail.com>"]
-repository = "https://github.com/eldruin/mcp49x-rs"
+repository = "https://github.com/eldruin/mcp49xx-rs"
 license = "MIT OR Apache-2.0"
 description = "Platform-agnostic Rust driver for the MCP49x digital-to-analog converters (DAC)."
 readme = "README.md"
 keywords = ["digital", "analog", "dac", "spi", "embedded-hal-driver"]
 categories = ["embedded", "hardware-support", "no-std"]
-homepage = "https://github.com/eldruin/mcp49x-rs"
-documentation = "https://docs.rs/mcp49x"
+homepage = "https://github.com/eldruin/mcp49xx-rs"
+documentation = "https://docs.rs/mcp49xx"
 include = [
     "**/*.rs",
     "/Cargo.toml",
@@ -20,8 +20,8 @@ include = [
 ]
 
 [badges]
-travis-ci = { repository = "eldruin/mcp49x-rs", branch = "master" }
-coveralls = { repository = "eldruin/mcp49x-rs", branch = "master", service = "github" }
+travis-ci = { repository = "eldruin/mcp49xx-rs", branch = "master" }
+coveralls = { repository = "eldruin/mcp49xx-rs", branch = "master", service = "github" }
 maintenance = { status = "actively-developed" }
 
 [dependencies]

@@ -1,14 +1,14 @@
 extern crate embedded_hal;
 extern crate linux_embedded_hal;
-extern crate mcp49x;
+extern crate mcp49xx;
 
 use linux_embedded_hal::{Pin, Spidev};
-use mcp49x::{Command, Mcp49x};
+use mcp49xx::{Command, Mcp49xx};
 
 fn main() {
     let spi = Spidev::open("/dev/spidev0.0").unwrap();
     let cs = Pin::new(25);
-    let mut mcp4921 = Mcp49x::new_mcp4921(spi, cs);
+    let mut mcp4921 = Mcp49xx::new_mcp4921(spi, cs);
 
     let cmd = Command::default();
     let cmd = cmd.double_gain().value(50);

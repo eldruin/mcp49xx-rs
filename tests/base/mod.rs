@@ -1,5 +1,5 @@
-extern crate mcp49x;
-use mcp49x::{interface, marker, Mcp49x};
+extern crate mcp49xx;
+use mcp49xx::{interface, marker, Mcp49xx};
 extern crate embedded_hal_mock as hal;
 use self::hal::spi::{Mock as SpiMock, Transaction as SpiTrans};
 
@@ -14,13 +14,13 @@ macro_rules! device_support {
     ($create:ident, $resolution:ident, $channels:ident, $buffering:ident) => {
         pub fn $create(
             transactions: &[SpiTrans],
-        ) -> Mcp49x<
+        ) -> Mcp49xx<
             interface::SpiInterface<SpiMock, DummyOutputPin>,
             marker::$resolution,
             marker::$channels,
             marker::$buffering,
         > {
-            Mcp49x::$create(SpiMock::new(&transactions), DummyOutputPin)
+            Mcp49xx::$create(SpiMock::new(&transactions), DummyOutputPin)
         }
     };
 }
