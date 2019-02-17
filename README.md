@@ -12,7 +12,10 @@ digital-to-analog converters (DAC), based on the [`embedded-hal`] traits.
 [`embedded-hal`]: https://github.com/rust-embedded/embedded-hal
 
 This driver allows you to:
-TODO
+- Set a channel to a value.
+- Shutdown a channel.
+- Use buffering on commands.
+- Select gain.
 
 ## The devices
 The Microchip Technology Inc. MCP49xx devices are single/dual channel 8-bit,
