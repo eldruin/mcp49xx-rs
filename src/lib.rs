@@ -34,7 +34,7 @@
 //! and industrial applications where calibration or compensation of signals
 //! (such as temperature, pressure and humidity) are required.
 //!
-//! This driver should be compatible with these devices:
+//! This driver is compatible with these devices:
 //!
 //! | Device  | Resolution | Channels | Buffering     |
 //! |---------|------------|----------|---------------|
@@ -65,8 +65,93 @@
 //! which can be used to specify all settings.
 //! Then commands can be sent to the device through the `send()` method.
 //!
-//! ## Usage
-//! TODO
+//! ## Usage examples (see also examples folder)
+//!
+//! To use this driver, import this crate and an `embedded_hal` implementation,
+//! then instantiate the appropriate device.
+//! In the following examples an instance of the device MCP4921 will be created
+//! as an example. Other devices can be created with similar methods like:
+//! `Mcp49xx::new_mcp4822(...)`.
+//!
+//! Please find additional examples using hardware in this repository: [driver-examples]
+//!
+//! [driver-examples]: https://github.com/eldruin/driver-examples
+//!
+//! ### Set channel 0 to position 1024 in a MCP4921 device
+//!
+//! ```no_run
+//! extern crate embedded_hal;
+//! extern crate linux_embedded_hal;
+//! extern crate mcp49xx;
+//! use mcp49xx::{Channel, Command, Mcp49xx};
+//! use linux_embedded_hal::{Pin, Spidev};
+//!
+//! # fn main() {
+//! let spi = Spidev::open("/dev/spidev0.0").unwrap();
+//! let chip_select = Pin::new(25);
+//!
+//! let mut dac = Mcp49xx::new_mcp4921(spi, chip_select);
+//!
+//! let cmd = Command::default();
+//! let cmd = cmd.channel(Channel::Ch0).value(1024);
+//! dac.send(cmd).unwrap();
+//!
+//! // Get SPI device and CS pin back
+//! let (_spi, _chip_select) = dac.destroy();
+//! # }
+//! ```
+//!
+//! ### Set position and shutdown channels in a MCP4822 device
+//!
+//! ```no_run
+//! extern crate embedded_hal;
+//! extern crate linux_embedded_hal;
+//! extern crate mcp49xx;
+//! use mcp49xx::{Channel, Command, Mcp49xx};
+//! use linux_embedded_hal::{Pin, Spidev};
+//!
+//! # fn main() {
+//! let spi = Spidev::open("/dev/spidev0.0").unwrap();
+//! let chip_select = Pin::new(25);
+//!
+//! let mut dac = Mcp49xx::new_mcp4822(spi, chip_select);
+//!
+//! let cmd = Command::default();
+//! let cmd = cmd.channel(Channel::Ch1).value(1024);
+//! dac.send(cmd).unwrap();
+//!
+//! let cmd = Command::default();
+//! let cmd = cmd.channel(Channel::Ch0).shutdown();
+//! dac.send(cmd).unwrap();
+//!
+//! // Get SPI device and CS pin back
+//! let (_spi, _chip_select) = dac.destroy();
+//! # }
+//! ```
+//!
+//! ### Set position and activate buffering and double gain in a MCP4911 device
+//!
+//! ```no_run
+//! extern crate embedded_hal;
+//! extern crate linux_embedded_hal;
+//! extern crate mcp49xx;
+//! use mcp49xx::{Channel, Command, Mcp49xx};
+//! use linux_embedded_hal::{Pin, Spidev};
+//!
+//! # fn main() {
+//! let spi = Spidev::open("/dev/spidev0.0").unwrap();
+//! let chip_select = Pin::new(25);
+//!
+//! let mut dac = Mcp49xx::new_mcp4911(spi, chip_select);
+//!
+//! let cmd = Command::default();
+//! let cmd = cmd.channel(Channel::Ch0).buffered().double_gain().value(511);
+//! dac.send(cmd).unwrap();
+//!
+//! // Get SPI device and CS pin back
+//! let (_spi, _chip_select) = dac.destroy();
+//! # }
+//! ```
 
 #![deny(unsafe_code, missing_docs, warnings)]
 #![no_std]
