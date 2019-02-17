@@ -1,4 +1,4 @@
-# Rust MCP49x digital-to-analog converter (DAC) driver
+# Rust MCP49xx and MCP48xx digital-to-analog converter (DAC) driver
 
 [![crates.io](https://img.shields.io/crates/v/mcp49xx.svg)](https://crates.io/crates/mcp49xx)
 [![Docs](https://docs.rs/mcp49xx/badge.svg)](https://docs.rs/mcp49xx)
