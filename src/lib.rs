@@ -153,7 +153,7 @@
 //! # }
 //! ```
 
-#![deny(unsafe_code, missing_docs, warnings)]
+#![deny(unsafe_code, missing_docs)]
 #![no_std]
 
 use core::marker::PhantomData;
