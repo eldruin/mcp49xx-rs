@@ -1,10 +1,10 @@
 use core::marker::PhantomData;
-use {interface, marker, Mcp49xx};
+use {marker, Mcp49xx};
 
-impl<SPI, CS, RES, CH, BUF> Mcp49xx<interface::SpiInterface<SPI, CS>, RES, CH, BUF> {
-    /// Destroy driver instance, return SPI bus instance and CS output pin.
-    pub fn destroy(self) -> (SPI, CS) {
-        (self.iface.spi, self.iface.cs)
+impl<SPI, CS, RES, CH, BUF> Mcp49xx<CS, SPI, RES, CH, BUF> {
+    /// Destroy driver instance, return CS output pin.
+    pub fn destroy(self) -> CS {
+        self.chip_select_pin
     }
 }
 
@@ -19,19 +19,17 @@ macro_rules! impl_create {
     ( @gen [$create:ident, $resolution:ident, $channels:ident, $buffering:ident, $doc:expr] ) => {
         impl<SPI, CS>
             Mcp49xx<
-                interface::SpiInterface<SPI, CS>,
+                CS, SPI,
                 marker::$resolution,
                 marker::$channels,
                 marker::$buffering,
             >
         {
             #[doc = $doc]
-            pub fn $create(spi: SPI, chip_select: CS) -> Self {
+            pub fn $create(spi: &mut SPI, chip_select: CS) -> Self {
                 Mcp49xx {
-                    iface: interface::SpiInterface {
-                        spi,
-                        cs: chip_select,
-                    },
+                    chip_select_pin: chip_select,
+                    _spi: PhantomData,
                     _resolution: PhantomData,
                     _channels: PhantomData,
                     _buffering: PhantomData,

@@ -199,8 +199,9 @@ pub enum Channel {
 
 /// MCP49xx digital potentiometer driver
 #[derive(Debug, Default)]
-pub struct Mcp49xx<DI, RES, CH, BUF> {
-    iface: DI,
+pub struct Mcp49xx<CS, SPI, RES, CH, BUF> {
+    chip_select_pin : CS,
+    _spi: PhantomData<SPI>,
     _resolution: PhantomData<RES>,
     _channels: PhantomData<CH>,
     _buffering: PhantomData<BUF>,
@@ -226,9 +227,10 @@ pub mod marker {
     pub struct Unbuffered(());
 }
 
-impl<DI, RES, CH, BUF, E> Mcp49xx<DI, RES, CH, BUF>
+impl<CS, SPI, RES, CH, BUF, E> Mcp49xx<CS, SPI, RES, CH, BUF>
 where
-    DI: interface::WriteCommand<Error = E>,
+    CS: hal::digital::OutputPin,
+    SPI: hal::blocking::spi::Write<u8, Error = E>,
     RES: ResolutionSupport<E>,
     CH: ChannelSupport<E>,
     BUF: BufferingSupport<E>,
@@ -241,20 +243,23 @@ where
     /// - If buffering is not supported it will return `Error::BufferingNotSupported`.
     ///
     /// Otherwise if a communication error happened it will return `Error::Comm`.
-    pub fn send(&mut self, command: Command) -> Result<(), Error<E>> {
+    pub fn send(&mut self, spi: &mut SPI, command: Command) -> Result<(), Error<E>> {
         CH::check_channel_is_appropriate(command.channel)?;
         RES::check_value_is_appropriate(command.value)?;
         BUF::check_buffering_is_appropriate(command.buffered)?;
         let value = RES::get_value_for_spi(command.value);
-        self.iface
-            .write_command(command.get_config_bits() | value[0], value[1])
+
+        self.chip_select_pin.set_low();
+        let payload: [u8; 2] = [command.get_config_bits() | value[0], value[1]];
+        let result = spi.write(&payload).map_err(Error::Comm);
+        self.chip_select_pin.set_high();
+        result
     }
 }
 
 mod command;
 mod construction;
 #[doc(hidden)]
-pub mod interface;
 mod resolution;
 pub use command::Command;
 #[doc(hidden)]
@@ -267,10 +272,8 @@ mod buffering;
 pub use buffering::BufferingSupport;
 
 mod private {
-    use super::{interface, marker};
+    use super::marker;
     pub trait Sealed {}
-
-    impl<SPI, CS> Sealed for interface::SpiInterface<SPI, CS> {}
 
     impl Sealed for marker::Resolution12Bit {}
     impl Sealed for marker::Resolution10Bit {}
