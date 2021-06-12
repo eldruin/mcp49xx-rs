@@ -1,4 +1,4 @@
-use super::Channel;
+use crate::Channel;
 
 /// Configurable command that can be sent to the device
 #[derive(Debug, Copy, Clone, PartialEq)]

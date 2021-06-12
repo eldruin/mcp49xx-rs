@@ -1,5 +1,5 @@
+use crate::{interface, marker, Mcp49xx};
 use core::marker::PhantomData;
-use {interface, marker, Mcp49xx};
 
 impl<SPI, CS, RES, CH, BUF> Mcp49xx<interface::SpiInterface<SPI, CS>, RES, CH, BUF> {
     /// Destroy driver instance, return SPI bus instance and CS output pin.

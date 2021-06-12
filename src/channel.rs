@@ -1,4 +1,4 @@
-use {marker, private, Channel, Error};
+use crate::{marker, private, Channel, Error};
 
 #[doc(hidden)]
 pub trait ChannelSupport<CommE, PinE>: private::Sealed {

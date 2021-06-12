@@ -80,13 +80,9 @@
 //! ### Set channel 0 to position 1024 in a MCP4921 device
 //!
 //! ```no_run
-//! extern crate embedded_hal;
-//! extern crate linux_embedded_hal;
-//! extern crate mcp49xx;
 //! use mcp49xx::{Channel, Command, Mcp49xx};
 //! use linux_embedded_hal::{Pin, Spidev};
 //!
-//! # fn main() {
 //! let spi = Spidev::open("/dev/spidev0.0").unwrap();
 //! let chip_select = Pin::new(25);
 //!
@@ -98,19 +94,14 @@
 //!
 //! // Get SPI device and CS pin back
 //! let (_spi, _chip_select) = dac.destroy();
-//! # }
 //! ```
 //!
 //! ### Set position and shutdown channels in a MCP4822 device
 //!
 //! ```no_run
-//! extern crate embedded_hal;
-//! extern crate linux_embedded_hal;
-//! extern crate mcp49xx;
 //! use mcp49xx::{Channel, Command, Mcp49xx};
 //! use linux_embedded_hal::{Pin, Spidev};
 //!
-//! # fn main() {
 //! let spi = Spidev::open("/dev/spidev0.0").unwrap();
 //! let chip_select = Pin::new(25);
 //!
@@ -126,19 +117,14 @@
 //!
 //! // Get SPI device and CS pin back
 //! let (_spi, _chip_select) = dac.destroy();
-//! # }
 //! ```
 //!
 //! ### Set position and activate buffering and double gain in a MCP4911 device
 //!
 //! ```no_run
-//! extern crate embedded_hal;
-//! extern crate linux_embedded_hal;
-//! extern crate mcp49xx;
 //! use mcp49xx::{Channel, Command, Mcp49xx};
 //! use linux_embedded_hal::{Pin, Spidev};
 //!
-//! # fn main() {
 //! let spi = Spidev::open("/dev/spidev0.0").unwrap();
 //! let chip_select = Pin::new(25);
 //!
@@ -150,15 +136,13 @@
 //!
 //! // Get SPI device and CS pin back
 //! let (_spi, _chip_select) = dac.destroy();
-//! # }
 //! ```
 
 #![deny(unsafe_code, missing_docs)]
 #![no_std]
 
 use core::marker::PhantomData;
-extern crate embedded_hal as hal;
-use hal::spi::{Mode, Phase, Polarity};
+use embedded_hal::spi::{Mode, Phase, Polarity};
 
 /// All possible errors in this crate
 #[derive(Debug)]
@@ -255,21 +239,22 @@ where
 
 mod command;
 mod construction;
-#[doc(hidden)]
+
+/// Interface module
 pub mod interface;
 mod resolution;
-pub use command::Command;
+pub use crate::command::Command;
 #[doc(hidden)]
-pub use resolution::ResolutionSupport;
+pub use crate::resolution::ResolutionSupport;
 mod channel;
 #[doc(hidden)]
-pub use channel::ChannelSupport;
+pub use crate::channel::ChannelSupport;
 mod buffering;
 #[doc(hidden)]
-pub use buffering::BufferingSupport;
+pub use crate::buffering::BufferingSupport;
 
 mod private {
-    use super::{interface, marker};
+    use crate::{interface, marker};
     pub trait Sealed {}
 
     impl<SPI, CS> Sealed for interface::SpiInterface<SPI, CS> {}

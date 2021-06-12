@@ -1,9 +1,7 @@
 //! SPI interface
 
-#![deny(missing_docs)]
-
-extern crate embedded_hal as hal;
-use super::{private, Error};
+use crate::{private, Error};
+use embedded_hal::{blocking::spi::Write, digital::v2::OutputPin};
 
 /// SPI interface
 #[derive(Debug, Default)]
@@ -16,14 +14,15 @@ pub struct SpiInterface<SPI, CS> {
 pub trait WriteCommand: private::Sealed {
     /// Error type
     type Error;
+
     /// Command
     fn write_command(&mut self, command: u8, data: u8) -> Result<(), Self::Error>;
 }
 
 impl<SPI, CS, CommE, PinE> WriteCommand for SpiInterface<SPI, CS>
 where
-    SPI: hal::blocking::spi::Write<u8, Error = CommE>,
-    CS: hal::digital::v2::OutputPin<Error = PinE>,
+    SPI: Write<u8, Error = CommE>,
+    CS: OutputPin<Error = PinE>,
 {
     type Error = Error<CommE, PinE>;
 

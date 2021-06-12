@@ -1,8 +1,6 @@
-extern crate mcp49xx;
+use embedded_hal_mock::pin::{Mock as PinMock, State as PinState, Transaction as PinTrans};
+use embedded_hal_mock::spi::{Mock as SpiMock, Transaction as SpiTrans};
 use mcp49xx::{interface, marker, Mcp49xx};
-extern crate embedded_hal_mock as hal;
-use self::hal::pin::{Mock as PinMock, State as PinState, Transaction as PinTrans};
-use self::hal::spi::{Mock as SpiMock, Transaction as SpiTrans};
 
 macro_rules! device_support {
     ($create:ident, $resolution:ident, $channels:ident, $buffering:ident) => {

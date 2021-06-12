@@ -1,4 +1,4 @@
-use {marker, private, Error};
+use crate::{marker, private, Error};
 
 #[doc(hidden)]
 pub trait ResolutionSupport<CommE, PinE>: private::Sealed {
