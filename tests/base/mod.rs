@@ -20,7 +20,7 @@ macro_rules! device_support {
             marker::$channels,
             marker::$buffering,
         > {
-            Mcp49xx::$create(SpiMock::new(&transactions), DummyOutputPin)
+            Mcp49xx::$create(SpiMock::new(transactions), DummyOutputPin)
         }
     };
 }
