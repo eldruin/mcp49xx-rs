@@ -140,6 +140,7 @@
 
 #![deny(unsafe_code, missing_docs)]
 #![no_std]
+#![doc(html_root_url = "https://docs.rs/mcp49xx/0.1.0")]
 
 use core::marker::PhantomData;
 use embedded_hal::spi::{Mode, Phase, Polarity};
