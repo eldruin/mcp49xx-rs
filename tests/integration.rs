@@ -34,14 +34,14 @@ macro_rules! assert_error {
 
 #[test]
 fn matches() {
-    let result: Result<(), Error<()>> = Err(Error::InvalidValue);
+    let result: Result<(), Error<(), ()>> = Err(Error::InvalidValue);
     assert_error!(result, InvalidValue);
 }
 
 #[should_panic]
 #[test]
 fn can_fail() {
-    let result: Result<(), Error<()>> = Ok(());
+    let result: Result<(), Error<(), ()>> = Ok(());
     assert_error!(result, InvalidValue);
 }
 

@@ -162,9 +162,11 @@ use hal::spi::{Mode, Phase, Polarity};
 
 /// All possible errors in this crate
 #[derive(Debug)]
-pub enum Error<E> {
+pub enum Error<CommE, PinE> {
     /// Communication error
-    Comm(E),
+    Comm(CommE),
+    /// Pin error
+    Pin(PinE),
     /// The channel provided is not available in the current device (MCP4xx1)
     InvalidChannel,
     /// The value provided does not fit the bitness of the current device
@@ -226,12 +228,12 @@ pub mod marker {
     pub struct Unbuffered(());
 }
 
-impl<DI, RES, CH, BUF, E> Mcp49xx<DI, RES, CH, BUF>
+impl<DI, RES, CH, BUF, CommE, PinE> Mcp49xx<DI, RES, CH, BUF>
 where
-    DI: interface::WriteCommand<Error = E>,
-    RES: ResolutionSupport<E>,
-    CH: ChannelSupport<E>,
-    BUF: BufferingSupport<E>,
+    DI: interface::WriteCommand<Error = Error<CommE, PinE>>,
+    RES: ResolutionSupport<CommE, PinE>,
+    CH: ChannelSupport<CommE, PinE>,
+    BUF: BufferingSupport<CommE, PinE>,
 {
     /// Send command to device.
     ///
@@ -241,7 +243,7 @@ where
     /// - If buffering is not supported it will return `Error::BufferingNotSupported`.
     ///
     /// Otherwise if a communication error happened it will return `Error::Comm`.
-    pub fn send(&mut self, command: Command) -> Result<(), Error<E>> {
+    pub fn send(&mut self, command: Command) -> Result<(), Error<CommE, PinE>> {
         CH::check_channel_is_appropriate(command.channel)?;
         RES::check_value_is_appropriate(command.value)?;
         BUF::check_buffering_is_appropriate(command.buffered)?;
