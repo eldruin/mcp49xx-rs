@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 - [breaking-change] Use fallible output pins. `Error` type now contains `Pin` variant.
+- `interface` module is now public to ease usage.
 
 ## 0.1.0 - 2019-02-17
 
