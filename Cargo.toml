@@ -20,11 +20,6 @@ include = [
 ]
 edition = "2018"
 
-[badges]
-travis-ci = { repository = "eldruin/mcp49xx-rs", branch = "master" }
-coveralls = { repository = "eldruin/mcp49xx-rs", branch = "master", service = "github" }
-maintenance = { status = "actively-developed" }
-
 [dependencies]
 embedded-hal = "0.2.3"
 

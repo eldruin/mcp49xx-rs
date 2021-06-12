@@ -2,9 +2,8 @@
 
 [![crates.io](https://img.shields.io/crates/v/mcp49xx.svg)](https://crates.io/crates/mcp49xx)
 [![Docs](https://docs.rs/mcp49xx/badge.svg)](https://docs.rs/mcp49xx)
-[![Build Status](https://travis-ci.org/eldruin/mcp49xx-rs.svg?branch=master)](https://travis-ci.org/eldruin/mcp49xx-rs)
+[![Build Status](https://github.com/eldruin/mcp49xx-rs/workflows/Build/badge.svg)](https://github.com/eldruin/mcp49xx-rs/actions?query=workflow%3ABuild)
 [![Coverage Status](https://coveralls.io/repos/github/eldruin/mcp49xx-rs/badge.svg?branch=master)](https://coveralls.io/github/eldruin/mcp49xx-rs?branch=master)
-![Maintenance Intention](https://img.shields.io/badge/maintenance-actively--developed-brightgreen.svg)
 
 This is a platform-agnostic Rust driver for the MCP49xx and MCP48xx SPI
 digital-to-analog converters (DAC), based on the [`embedded-hal`] traits.
