@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+...
+
+## [0.2.0] - 2021-09-16
+
 ### Added
 - `PartialEq` trait implementation for the `Error` type.
 
@@ -23,4 +27,5 @@ This is the initial release to crates.io of the feature-complete driver. There
 may be some API changes in the future, in case I decide that something can be
 further improved. All changes will be documented in this CHANGELOG.
 
-[Unreleased]: https://github.com/eldruin/mcp49xx-rs/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/eldruin/mcp49xx-rs/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/eldruin/mcp49xx-rs/compare/v0.1.0...v0.2.0
