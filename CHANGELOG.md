@@ -8,7 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 
 ### Changed
+- [breaking-change] SPI mode constants have been replaced with reexports of the constants from `embedded_hal`.
+  `MODE0` (0,0) corresponds now to `MODE_0` and `MODE1` (1,1) to `MODE_3`.
 - [breaking-change] Use fallible output pins. `Error` type now contains `Pin` variant.
+- [breaking-change] Removed `Default` trait implementation for `Mcp49xx`.
 - `interface` module is now public to ease usage.
 
 ## 0.1.0 - 2019-02-17

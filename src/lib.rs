@@ -143,7 +143,7 @@
 #![doc(html_root_url = "https://docs.rs/mcp49xx/0.1.0")]
 
 use core::marker::PhantomData;
-use embedded_hal::spi::{Mode, Phase, Polarity};
+pub use embedded_hal::spi::{MODE_0, MODE_3};
 
 /// All possible errors in this crate
 #[derive(Debug)]
@@ -160,18 +160,6 @@ pub enum Error<CommE, PinE> {
     BufferingNotSupported,
 }
 
-/// SPI mode (CPOL = 0, CPHA = 0)
-pub const MODE0: Mode = Mode {
-    phase: Phase::CaptureOnFirstTransition,
-    polarity: Polarity::IdleLow,
-};
-
-/// SPI mode (CPOL = 1, CPHA = 1)
-pub const MODE1: Mode = Mode {
-    phase: Phase::CaptureOnSecondTransition,
-    polarity: Polarity::IdleHigh,
-};
-
 /// Channel selector
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Channel {
@@ -185,7 +173,7 @@ pub enum Channel {
 }
 
 /// MCP49xx digital potentiometer driver
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct Mcp49xx<DI, RES, CH, BUF> {
     iface: DI,
     _resolution: PhantomData<RES>,
