@@ -146,7 +146,7 @@ use core::marker::PhantomData;
 pub use embedded_hal::spi::{MODE_0, MODE_3};
 
 /// All possible errors in this crate
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Error<CommE, PinE> {
     /// Communication error
     Comm(CommE),

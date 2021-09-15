@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+- `PartialEq` trait implementation for the `Error` type.
+
 ### Changed
 - [breaking-change] SPI mode constants have been replaced with reexports of the constants from `embedded_hal`.
   `MODE0` (0,0) corresponds now to `MODE_0` and `MODE1` (1,1) to `MODE_3`.
