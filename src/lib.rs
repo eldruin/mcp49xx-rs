@@ -38,18 +38,18 @@
 //!
 //! | Device  | Resolution | Channels | Buffering     |
 //! |---------|------------|----------|---------------|
-//! | MCP4801 | 8-bit      | 1        | Not supported |
-//! | MCP4802 | 8-bit      | 2        | Not supported |
-//! | MCP4811 | 10-bit     | 1        | Not supported |
-//! | MCP4812 | 10-bit     | 2        | Not supported |
-//! | MCP4821 | 12-bit     | 1        | Not supported |
-//! | MCP4822 | 12-bit     | 2        | Not supported |
-//! | MCP4901 | 8-bit      | 1        | Supported     |
-//! | MCP4902 | 8-bit      | 2        | Supported     |
-//! | MCP4911 | 10-bit     | 1        | Supported     |
-//! | MCP4912 | 10-bit     | 2        | Supported     |
-//! | MCP4921 | 12-bit     | 1        | Supported     |
-//! | MCP4922 | 12-bit     | 2        | Supported     |
+//! | MCP4801 | 8-bit      | 1        | Not available |
+//! | MCP4802 | 8-bit      | 2        | Not available |
+//! | MCP4811 | 10-bit     | 1        | Not available |
+//! | MCP4812 | 10-bit     | 2        | Not available |
+//! | MCP4821 | 12-bit     | 1        | Not available |
+//! | MCP4822 | 12-bit     | 2        | Not available |
+//! | MCP4901 | 8-bit      | 1        | Available     |
+//! | MCP4902 | 8-bit      | 2        | Available     |
+//! | MCP4911 | 10-bit     | 1        | Available     |
+//! | MCP4912 | 10-bit     | 2        | Available     |
+//! | MCP4921 | 12-bit     | 1        | Available     |
+//! | MCP4922 | 12-bit     | 2        | Available     |
 //!
 //! Datasheets:
 //! - [MCP48x1](http://ww1.microchip.com/downloads/en/DeviceDoc/22244B.pdf)
