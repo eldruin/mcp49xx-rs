@@ -174,7 +174,7 @@ pub enum Channel {
 }
 
 /// MCP49xx digital potentiometer driver
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct Mcp49xx<CS, SPI, RES, CH, BUF> {
     cs : CS,
     _spi: PhantomData<SPI>,
