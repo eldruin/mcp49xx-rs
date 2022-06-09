@@ -143,6 +143,7 @@
 #![doc(html_root_url = "https://docs.rs/mcp49xx/0.2.0")]
 
 use core::marker::PhantomData;
+use embedded_hal::{blocking::spi::Write, digital::v2::OutputPin};
 pub use embedded_hal::spi::{MODE_0, MODE_3};
 
 /// All possible errors in this crate
@@ -173,9 +174,10 @@ pub enum Channel {
 }
 
 /// MCP49xx digital potentiometer driver
-#[derive(Debug)]
-pub struct Mcp49xx<DI, RES, CH, BUF> {
-    iface: DI,
+#[derive(Debug, Default)]
+pub struct Mcp49xx<CS, SPI, RES, CH, BUF> {
+    cs : CS,
+    _spi: PhantomData<SPI>,
     _resolution: PhantomData<RES>,
     _channels: PhantomData<CH>,
     _buffering: PhantomData<BUF>,
@@ -201,9 +203,10 @@ pub mod marker {
     pub struct Unbuffered(());
 }
 
-impl<DI, RES, CH, BUF, CommE, PinE> Mcp49xx<DI, RES, CH, BUF>
+impl<CS, SPI, RES, CH, BUF, CommE, PinE> Mcp49xx<CS, SPI, RES, CH, BUF>
 where
-    DI: interface::WriteCommand<Error = Error<CommE, PinE>>,
+    CS: OutputPin<Error = PinE>,
+    SPI: Write<u8, Error = CommE>,
     RES: ResolutionSupport<CommE, PinE>,
     CH: ChannelSupport<CommE, PinE>,
     BUF: BufferingSupport<CommE, PinE>,
@@ -216,21 +219,23 @@ where
     /// - If buffering is not supported it will return `Error::BufferingNotSupported`.
     ///
     /// Otherwise if a communication error happened it will return `Error::Comm`.
-    pub fn send(&mut self, command: Command) -> Result<(), Error<CommE, PinE>> {
+    pub fn send(&mut self, spi: &mut SPI, command: Command) -> Result<(), Error<CommE, PinE>> {
         CH::check_channel_is_appropriate(command.channel)?;
         RES::check_value_is_appropriate(command.value)?;
         BUF::check_buffering_is_appropriate(command.buffered)?;
         let value = RES::get_value_for_spi(command.value);
-        self.iface
-            .write_command(command.get_config_bits() | value[0], value[1])
+
+        self.cs.set_low().map_err(Error::Pin)?;
+        let payload: [u8; 2] = [command.get_config_bits() | value[0], value[1]];
+        let result = spi.write(&payload).map_err(Error::Comm);
+        self.cs.set_high().map_err(Error::Pin)?;
+        result
     }
 }
 
 mod command;
 mod construction;
 
-/// Interface module
-pub mod interface;
 mod resolution;
 pub use crate::command::Command;
 #[doc(hidden)]
@@ -243,10 +248,8 @@ mod buffering;
 pub use crate::buffering::BufferingSupport;
 
 mod private {
-    use crate::{interface, marker};
+    use crate::marker;
     pub trait Sealed {}
-
-    impl<SPI, CS> Sealed for interface::SpiInterface<SPI, CS> {}
 
     impl Sealed for marker::Resolution12Bit {}
     impl Sealed for marker::Resolution10Bit {}
