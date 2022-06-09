@@ -143,8 +143,8 @@
 #![doc(html_root_url = "https://docs.rs/mcp49xx/0.2.0")]
 
 use core::marker::PhantomData;
-use embedded_hal::{blocking::spi::Write, digital::v2::OutputPin};
 pub use embedded_hal::spi::{MODE_0, MODE_3};
+use embedded_hal::{blocking::spi::Write, digital::v2::OutputPin};
 
 /// All possible errors in this crate
 #[derive(Debug, PartialEq)]
@@ -176,7 +176,7 @@ pub enum Channel {
 /// MCP49xx digital potentiometer driver
 #[derive(Debug)]
 pub struct Mcp49xx<CS, SPI, RES, CH, BUF> {
-    cs : CS,
+    cs: CS,
     _spi: PhantomData<SPI>,
     _resolution: PhantomData<RES>,
     _channels: PhantomData<CH>,

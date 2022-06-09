@@ -6,13 +6,7 @@ macro_rules! device_support {
     ($create:ident, $resolution:ident, $channels:ident, $buffering:ident) => {
         pub fn $create(
             transactions: &[SpiTrans],
-        ) -> Mcp49xx<
-            PinMock,
-            SpiMock,
-            marker::$resolution,
-            marker::$channels,
-            marker::$buffering,
-        > {
+        ) -> Mcp49xx<PinMock, SpiMock, marker::$resolution, marker::$channels, marker::$buffering> {
             let pin_transactions: Vec<PinTrans> = transactions
                 .iter()
                 .flat_map(|_| [PinTrans::set(PinState::Low), PinTrans::set(PinState::High)])

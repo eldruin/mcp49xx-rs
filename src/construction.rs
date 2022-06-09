@@ -17,14 +17,7 @@ macro_rules! impl_create {
     };
 
     ( @gen [$create:ident, $resolution:ident, $channels:ident, $buffering:ident, $doc:expr] ) => {
-        impl<SPI, CS>
-            Mcp49xx<
-                CS, SPI,
-                marker::$resolution,
-                marker::$channels,
-                marker::$buffering,
-            >
-        {
+        impl<SPI, CS> Mcp49xx<CS, SPI, marker::$resolution, marker::$channels, marker::$buffering> {
             #[doc = $doc]
             pub fn $create(chip_select: CS) -> Self {
                 Mcp49xx {
