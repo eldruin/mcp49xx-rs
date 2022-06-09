@@ -1,10 +1,10 @@
+use crate::{marker, Mcp49xx};
 use core::marker::PhantomData;
-use {marker, Mcp49xx};
 
 impl<SPI, CS, RES, CH, BUF> Mcp49xx<CS, SPI, RES, CH, BUF> {
     /// Destroy driver instance, return CS output pin.
     pub fn destroy(self) -> CS {
-        self.chip_select_pin
+        self.cs
     }
 }
 
@@ -26,9 +26,9 @@ macro_rules! impl_create {
             >
         {
             #[doc = $doc]
-            pub fn $create(spi: &mut SPI, chip_select: CS) -> Self {
+            pub fn $create(chip_select: CS) -> Self {
                 Mcp49xx {
-                    chip_select_pin: chip_select,
+                    cs: chip_select,
                     _spi: PhantomData,
                     _resolution: PhantomData,
                     _channels: PhantomData,

@@ -1,9 +1,7 @@
-extern crate mcp49xx;
+use embedded_hal_mock::spi::Transaction as SpiTrans;
 use mcp49xx::{Channel, Command, Error};
-extern crate embedded_hal_mock as hal;
-use self::hal::spi::Transaction as SpiTrans;
 mod base;
-use base::{
+use crate::base::{
     new_mcp4801, new_mcp4802, new_mcp4811, new_mcp4812, new_mcp4821, new_mcp4822, new_mcp4901,
     new_mcp4902, new_mcp4911, new_mcp4912, new_mcp4921, new_mcp4922,
 };
@@ -34,14 +32,14 @@ macro_rules! assert_error {
 
 #[test]
 fn matches() {
-    let result: Result<(), Error<()>> = Err(Error::InvalidValue);
+    let result: Result<(), Error<(), ()>> = Err(Error::InvalidValue);
     assert_error!(result, InvalidValue);
 }
 
 #[should_panic]
 #[test]
 fn can_fail() {
-    let result: Result<(), Error<()>> = Ok(());
+    let result: Result<(), Error<(), ()>> = Ok(());
     assert_error!(result, InvalidValue);
 }
 

@@ -1,13 +1,13 @@
-use {marker, private, Error};
+use crate::{marker, private, Error};
 
 #[doc(hidden)]
-pub trait ResolutionSupport<E>: private::Sealed {
-    fn check_value_is_appropriate(value: u16) -> Result<(), Error<E>>;
+pub trait ResolutionSupport<CommE, PinE>: private::Sealed {
+    fn check_value_is_appropriate(value: u16) -> Result<(), Error<CommE, PinE>>;
     fn get_value_for_spi(value: u16) -> [u8; 2];
 }
 
-impl<E> ResolutionSupport<E> for marker::Resolution12Bit {
-    fn check_value_is_appropriate(value: u16) -> Result<(), Error<E>> {
+impl<CommE, PinE> ResolutionSupport<CommE, PinE> for marker::Resolution12Bit {
+    fn check_value_is_appropriate(value: u16) -> Result<(), Error<CommE, PinE>> {
         if value >= 1 << 12 {
             Err(Error::InvalidValue)
         } else {
@@ -19,8 +19,8 @@ impl<E> ResolutionSupport<E> for marker::Resolution12Bit {
     }
 }
 
-impl<E> ResolutionSupport<E> for marker::Resolution10Bit {
-    fn check_value_is_appropriate(value: u16) -> Result<(), Error<E>> {
+impl<CommE, PinE> ResolutionSupport<CommE, PinE> for marker::Resolution10Bit {
+    fn check_value_is_appropriate(value: u16) -> Result<(), Error<CommE, PinE>> {
         if value >= 1 << 10 {
             Err(Error::InvalidValue)
         } else {
@@ -32,8 +32,8 @@ impl<E> ResolutionSupport<E> for marker::Resolution10Bit {
     }
 }
 
-impl<E> ResolutionSupport<E> for marker::Resolution8Bit {
-    fn check_value_is_appropriate(value: u16) -> Result<(), Error<E>> {
+impl<CommE, PinE> ResolutionSupport<CommE, PinE> for marker::Resolution8Bit {
+    fn check_value_is_appropriate(value: u16) -> Result<(), Error<CommE, PinE>> {
         if value >= 1 << 8 {
             Err(Error::InvalidValue)
         } else {

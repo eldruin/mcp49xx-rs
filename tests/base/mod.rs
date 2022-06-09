@@ -1,26 +1,22 @@
-extern crate mcp49xx;
+use embedded_hal_mock::pin::{Mock as PinMock, State as PinState, Transaction as PinTrans};
+use embedded_hal_mock::spi::{Mock as SpiMock, Transaction as SpiTrans};
 use mcp49xx::{interface, marker, Mcp49xx};
-extern crate embedded_hal_mock as hal;
-use self::hal::spi::{Mock as SpiMock, Transaction as SpiTrans};
-
-pub struct DummyOutputPin;
-
-impl embedded_hal::digital::OutputPin for DummyOutputPin {
-    fn set_low(&mut self) {}
-    fn set_high(&mut self) {}
-}
 
 macro_rules! device_support {
     ($create:ident, $resolution:ident, $channels:ident, $buffering:ident) => {
         pub fn $create(
             transactions: &[SpiTrans],
         ) -> Mcp49xx<
-            interface::SpiInterface<SpiMock, DummyOutputPin>,
+            interface::SpiInterface<SpiMock, PinMock>,
             marker::$resolution,
             marker::$channels,
             marker::$buffering,
         > {
-            Mcp49xx::$create(SpiMock::new(&transactions), DummyOutputPin)
+            let pin_transactions: Vec<PinTrans> = transactions
+                .iter()
+                .flat_map(|_| [PinTrans::set(PinState::Low), PinTrans::set(PinState::High)])
+                .collect();
+            Mcp49xx::$create(SpiMock::new(transactions), PinMock::new(&pin_transactions))
         }
     };
 }

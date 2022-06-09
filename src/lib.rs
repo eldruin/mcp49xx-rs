@@ -38,18 +38,18 @@
 //!
 //! | Device  | Resolution | Channels | Buffering     |
 //! |---------|------------|----------|---------------|
-//! | MCP4801 | 8-bit      | 1        | Not supported |
-//! | MCP4802 | 8-bit      | 2        | Not supported |
-//! | MCP4811 | 10-bit     | 1        | Not supported |
-//! | MCP4812 | 10-bit     | 2        | Not supported |
-//! | MCP4821 | 12-bit     | 1        | Not supported |
-//! | MCP4822 | 12-bit     | 2        | Not supported |
-//! | MCP4901 | 8-bit      | 1        | Supported     |
-//! | MCP4902 | 8-bit      | 2        | Supported     |
-//! | MCP4911 | 10-bit     | 1        | Supported     |
-//! | MCP4912 | 10-bit     | 2        | Supported     |
-//! | MCP4921 | 12-bit     | 1        | Supported     |
-//! | MCP4922 | 12-bit     | 2        | Supported     |
+//! | MCP4801 | 8-bit      | 1        | Not available |
+//! | MCP4802 | 8-bit      | 2        | Not available |
+//! | MCP4811 | 10-bit     | 1        | Not available |
+//! | MCP4812 | 10-bit     | 2        | Not available |
+//! | MCP4821 | 12-bit     | 1        | Not available |
+//! | MCP4822 | 12-bit     | 2        | Not available |
+//! | MCP4901 | 8-bit      | 1        | Available     |
+//! | MCP4902 | 8-bit      | 2        | Available     |
+//! | MCP4911 | 10-bit     | 1        | Available     |
+//! | MCP4912 | 10-bit     | 2        | Available     |
+//! | MCP4921 | 12-bit     | 1        | Available     |
+//! | MCP4922 | 12-bit     | 2        | Available     |
 //!
 //! Datasheets:
 //! - [MCP48x1](http://ww1.microchip.com/downloads/en/DeviceDoc/22244B.pdf)
@@ -80,13 +80,9 @@
 //! ### Set channel 0 to position 1024 in a MCP4921 device
 //!
 //! ```no_run
-//! extern crate embedded_hal;
-//! extern crate linux_embedded_hal;
-//! extern crate mcp49xx;
 //! use mcp49xx::{Channel, Command, Mcp49xx};
 //! use linux_embedded_hal::{Pin, Spidev};
 //!
-//! # fn main() {
 //! let spi = Spidev::open("/dev/spidev0.0").unwrap();
 //! let chip_select = Pin::new(25);
 //!
@@ -98,19 +94,14 @@
 //!
 //! // Get SPI device and CS pin back
 //! let (_spi, _chip_select) = dac.destroy();
-//! # }
 //! ```
 //!
 //! ### Set position and shutdown channels in a MCP4822 device
 //!
 //! ```no_run
-//! extern crate embedded_hal;
-//! extern crate linux_embedded_hal;
-//! extern crate mcp49xx;
 //! use mcp49xx::{Channel, Command, Mcp49xx};
 //! use linux_embedded_hal::{Pin, Spidev};
 //!
-//! # fn main() {
 //! let spi = Spidev::open("/dev/spidev0.0").unwrap();
 //! let chip_select = Pin::new(25);
 //!
@@ -126,19 +117,14 @@
 //!
 //! // Get SPI device and CS pin back
 //! let (_spi, _chip_select) = dac.destroy();
-//! # }
 //! ```
 //!
 //! ### Set position and activate buffering and double gain in a MCP4911 device
 //!
 //! ```no_run
-//! extern crate embedded_hal;
-//! extern crate linux_embedded_hal;
-//! extern crate mcp49xx;
 //! use mcp49xx::{Channel, Command, Mcp49xx};
 //! use linux_embedded_hal::{Pin, Spidev};
 //!
-//! # fn main() {
 //! let spi = Spidev::open("/dev/spidev0.0").unwrap();
 //! let chip_select = Pin::new(25);
 //!
@@ -150,21 +136,23 @@
 //!
 //! // Get SPI device and CS pin back
 //! let (_spi, _chip_select) = dac.destroy();
-//! # }
 //! ```
 
 #![deny(unsafe_code, missing_docs)]
 #![no_std]
+#![doc(html_root_url = "https://docs.rs/mcp49xx/0.2.0")]
 
 use core::marker::PhantomData;
-extern crate embedded_hal as hal;
-use hal::spi::{Mode, Phase, Polarity};
+use embedded_hal::{blocking::spi::Write, digital::v2::OutputPin};
+pub use embedded_hal::spi::{MODE_0, MODE_3};
 
 /// All possible errors in this crate
-#[derive(Debug)]
-pub enum Error<E> {
+#[derive(Debug, PartialEq)]
+pub enum Error<CommE, PinE> {
     /// Communication error
-    Comm(E),
+    Comm(CommE),
+    /// Pin error
+    Pin(PinE),
     /// The channel provided is not available in the current device (MCP4xx1)
     InvalidChannel,
     /// The value provided does not fit the bitness of the current device
@@ -172,18 +160,6 @@ pub enum Error<E> {
     /// Buffering is not available in the current device (MCP48xx)
     BufferingNotSupported,
 }
-
-/// SPI mode (CPOL = 0, CPHA = 0)
-pub const MODE0: Mode = Mode {
-    phase: Phase::CaptureOnFirstTransition,
-    polarity: Polarity::IdleLow,
-};
-
-/// SPI mode (CPOL = 1, CPHA = 1)
-pub const MODE1: Mode = Mode {
-    phase: Phase::CaptureOnSecondTransition,
-    polarity: Polarity::IdleHigh,
-};
 
 /// Channel selector
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -200,7 +176,7 @@ pub enum Channel {
 /// MCP49xx digital potentiometer driver
 #[derive(Debug, Default)]
 pub struct Mcp49xx<CS, SPI, RES, CH, BUF> {
-    chip_select_pin : CS,
+    cs : CS,
     _spi: PhantomData<SPI>,
     _resolution: PhantomData<RES>,
     _channels: PhantomData<CH>,
@@ -227,13 +203,13 @@ pub mod marker {
     pub struct Unbuffered(());
 }
 
-impl<CS, SPI, RES, CH, BUF, E> Mcp49xx<CS, SPI, RES, CH, BUF>
+impl<CS, SPI, RES, CH, BUF, CommE, PinE> Mcp49xx<CS, SPI, RES, CH, BUF>
 where
-    CS: hal::digital::OutputPin,
-    SPI: hal::blocking::spi::Write<u8, Error = E>,
-    RES: ResolutionSupport<E>,
-    CH: ChannelSupport<E>,
-    BUF: BufferingSupport<E>,
+    CS: OutputPin<Error = PinE>,
+    SPI: Write<u8, Error = CommE>,
+    RES: ResolutionSupport<CommE, PinE>,
+    CH: ChannelSupport<CommE, PinE>,
+    BUF: BufferingSupport<CommE, PinE>,
 {
     /// Send command to device.
     ///
@@ -243,36 +219,36 @@ where
     /// - If buffering is not supported it will return `Error::BufferingNotSupported`.
     ///
     /// Otherwise if a communication error happened it will return `Error::Comm`.
-    pub fn send(&mut self, spi: &mut SPI, command: Command) -> Result<(), Error<E>> {
+    pub fn send(&mut self, spi: &mut SPI, command: Command) -> Result<(), Error<CommE, PinE>> {
         CH::check_channel_is_appropriate(command.channel)?;
         RES::check_value_is_appropriate(command.value)?;
         BUF::check_buffering_is_appropriate(command.buffered)?;
         let value = RES::get_value_for_spi(command.value);
 
-        self.chip_select_pin.set_low();
+        self.cs.set_low().map_err(Error::Pin)?;
         let payload: [u8; 2] = [command.get_config_bits() | value[0], value[1]];
         let result = spi.write(&payload).map_err(Error::Comm);
-        self.chip_select_pin.set_high();
+        self.cs.set_high().map_err(Error::Pin)?;
         result
     }
 }
 
 mod command;
 mod construction;
-#[doc(hidden)]
+
 mod resolution;
-pub use command::Command;
+pub use crate::command::Command;
 #[doc(hidden)]
-pub use resolution::ResolutionSupport;
+pub use crate::resolution::ResolutionSupport;
 mod channel;
 #[doc(hidden)]
-pub use channel::ChannelSupport;
+pub use crate::channel::ChannelSupport;
 mod buffering;
 #[doc(hidden)]
-pub use buffering::BufferingSupport;
+pub use crate::buffering::BufferingSupport;
 
 mod private {
-    use super::marker;
+    use crate::marker;
     pub trait Sealed {}
 
     impl Sealed for marker::Resolution12Bit {}
