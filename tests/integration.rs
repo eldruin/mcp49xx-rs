@@ -1,4 +1,4 @@
-use embedded_hal_mock::spi::Transaction as SpiTrans;
+use embedded_hal_mock::spi::{Mock as SpiMock, Transaction as SpiTrans};
 use mcp49xx::{Channel, Command, Error};
 mod base;
 use crate::base::{
@@ -14,9 +14,10 @@ macro_rules! test {
                 ($value >> 8) as u8,
                 ($value & 0xff) as u8,
             ])];
+            let mut spi = SpiMock::new(&trans);
             let mut dev = $create(&trans);
-            dev.send($cmd).unwrap();
-            dev.destroy().0.done();
+            dev.send(&mut spi, $cmd).unwrap();
+            dev.destroy().done();
         }
     };
 }
@@ -113,12 +114,13 @@ macro_rules! invalid_value_test {
             use super::*;
             #[test]
             fn cannot_send_invalid_value() {
+                let mut spi = SpiMock::new(&[]);
                 let mut dev = $create(&[]);
                 assert_error!(
-                    dev.send(Command::default().value($too_big_value)),
+                    dev.send(&mut spi, Command::default().value($too_big_value)),
                     InvalidValue
                 );
-                dev.destroy().0.done();
+                dev.destroy().done();
             }
         }
     };
@@ -134,12 +136,13 @@ macro_rules! invalid_channel_test {
             use super::*;
             #[test]
             fn cannot_send_invalid_channel() {
+                let mut spi = SpiMock::new(&[]);
                 let mut dev = $create(&[]);
                 assert_error!(
-                    dev.send(Command::default().channel(Channel::Ch1)),
+                    dev.send(&mut spi, Command::default().channel(Channel::Ch1)),
                     InvalidChannel
                 );
-                dev.destroy().0.done();
+                dev.destroy().done();
             }
         }
     };
@@ -169,12 +172,13 @@ macro_rules! invalid_buffering_test {
             use super::*;
             #[test]
             fn cannot_send_buffered() {
+                let mut spi = SpiMock::new(&[]);
                 let mut dev = $create(&[]);
                 assert_error!(
-                    dev.send(Command::default().buffered()),
+                    dev.send(&mut spi, Command::default().buffered()),
                     BufferingNotSupported
                 );
-                dev.destroy().0.done();
+                dev.destroy().done();
             }
         }
     };

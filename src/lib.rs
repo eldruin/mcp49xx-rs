@@ -83,17 +83,17 @@
 //! use mcp49xx::{Channel, Command, Mcp49xx};
 //! use linux_embedded_hal::{Pin, Spidev};
 //!
-//! let spi = Spidev::open("/dev/spidev0.0").unwrap();
+//! let mut spi = Spidev::open("/dev/spidev0.0").unwrap();
 //! let chip_select = Pin::new(25);
 //!
-//! let mut dac = Mcp49xx::new_mcp4921(spi, chip_select);
+//! let mut dac = Mcp49xx::new_mcp4921(chip_select);
 //!
 //! let cmd = Command::default();
 //! let cmd = cmd.channel(Channel::Ch0).value(1024);
-//! dac.send(cmd).unwrap();
+//! dac.send(&mut spi, cmd).unwrap();
 //!
-//! // Get SPI device and CS pin back
-//! let (_spi, _chip_select) = dac.destroy();
+//! // Get CS pin back
+//! let _chip_select = dac.destroy();
 //! ```
 //!
 //! ### Set position and shutdown channels in a MCP4822 device
@@ -102,21 +102,21 @@
 //! use mcp49xx::{Channel, Command, Mcp49xx};
 //! use linux_embedded_hal::{Pin, Spidev};
 //!
-//! let spi = Spidev::open("/dev/spidev0.0").unwrap();
+//! let mut spi = Spidev::open("/dev/spidev0.0").unwrap();
 //! let chip_select = Pin::new(25);
 //!
-//! let mut dac = Mcp49xx::new_mcp4822(spi, chip_select);
+//! let mut dac = Mcp49xx::new_mcp4822(chip_select);
 //!
 //! let cmd = Command::default();
 //! let cmd = cmd.channel(Channel::Ch1).value(1024);
-//! dac.send(cmd).unwrap();
+//! dac.send(&mut spi, cmd).unwrap();
 //!
 //! let cmd = Command::default();
 //! let cmd = cmd.channel(Channel::Ch0).shutdown();
-//! dac.send(cmd).unwrap();
+//! dac.send(&mut spi, cmd).unwrap();
 //!
-//! // Get SPI device and CS pin back
-//! let (_spi, _chip_select) = dac.destroy();
+//! // Get CS pin back
+//! let _chip_select = dac.destroy();
 //! ```
 //!
 //! ### Set position and activate buffering and double gain in a MCP4911 device
@@ -125,17 +125,17 @@
 //! use mcp49xx::{Channel, Command, Mcp49xx};
 //! use linux_embedded_hal::{Pin, Spidev};
 //!
-//! let spi = Spidev::open("/dev/spidev0.0").unwrap();
+//! let mut spi = Spidev::open("/dev/spidev0.0").unwrap();
 //! let chip_select = Pin::new(25);
 //!
-//! let mut dac = Mcp49xx::new_mcp4911(spi, chip_select);
+//! let mut dac = Mcp49xx::new_mcp4911(chip_select);
 //!
 //! let cmd = Command::default();
 //! let cmd = cmd.channel(Channel::Ch0).buffered().double_gain().value(511);
-//! dac.send(cmd).unwrap();
+//! dac.send(&mut spi, cmd).unwrap();
 //!
-//! // Get SPI device and CS pin back
-//! let (_spi, _chip_select) = dac.destroy();
+//! // Get CS pin back
+//! let _chip_select = dac.destroy();
 //! ```
 
 #![deny(unsafe_code, missing_docs)]
