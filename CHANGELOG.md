@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
-...
+### Changed
+- [breaking-change] A reference to the SPI device is now passed in every call, which eases bus sharing.
 
 ## [0.2.0] - 2021-09-16
 
